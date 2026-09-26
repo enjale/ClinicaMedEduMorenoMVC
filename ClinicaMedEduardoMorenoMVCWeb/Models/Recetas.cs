@@ -3,6 +3,7 @@ using ClinicaMedEduardoMorenoMVCWeb.Data;
 using ClinicaMedEduardoMorenoMVCWeb.Models;
 using System.ComponentModel.DataAnnotations;
 
+
 namespace ClinicaMedEduardoMorenoMVCWeb.Models
 {
     public class Recetas

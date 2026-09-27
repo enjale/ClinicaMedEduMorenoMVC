@@ -1,0 +1,85 @@
+@model ClinicaMedEduardoMorenoMVCWeb.Models.ViewModels.LoginViewModel
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Inicio de Sesión - Clínica Médica";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="login-wrapper">
+        <!-- Panel Lateral Izquierdo -->
+        <div class="login-lateral">
+            <div class="login-subtitulo-clinica">CLÍNICA MÉDICA</div>
+            <div class="login-nombre-clinica">Eduardo Moreno</div>
+            <div class="login-linea-divisoria"></div>
+            <p class="login-descripcion-sistema">Sistema de Gestión de Expedientes Médicos</p>
+        </div>
+
+        <!-- Panel Central/Derecho con Tarjeta -->
+        <div class="login-derecho">
+            <div class="login-tarjeta">
+                <h2 class="login-titulo-formulario">Iniciar Sesión</h2>
+
+                <form asp-action="Login" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+
+                    <div class="login-form-group">
+                        <label asp-for="NombreUsuario" class="login-label">Usuario</label>
+                        <input asp-for="NombreUsuario" class="login-input" autocomplete="username" />
+                        <span asp-validation-for="NombreUsuario" class="text-danger small"></span>
+                    </div>
+
+                    <div class="login-form-group">
+                        <label asp-for="Contrasena" class="login-label">Contraseña</label>
+                        <div class="login-input-group">
+                            <input asp-for="Contrasena" id="txtContrasena" type="password" class="login-input" autocomplete="current-password" />
+                            <button type="button" id="btnToggleOjo" class="login-btn-ojo" title="Mostrar/Ocultar contraseña">
+                                👁️
+                            </button>
+                        </div>
+                        <span asp-validation-for="Contrasena" class="text-danger small"></span>
+                    </div>
+
+                    <button type="submit" class="login-boton-submit">
+                        Iniciar Sesión
+                    </button>
+
+                    <a href="#" class="login-enlace-olvide">
+                        ¿Olvidó su contraseña?
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+  
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Funcionalidad para el botón del ojo de la contraseña
+        const btnToggleOjo = document.getElementById('btnToggleOjo');
+        const txtContrasena = document.getElementById('txtContrasena');
+
+        if (btnToggleOjo && txtContrasena) {
+            btnToggleOjo.addEventListener('click', function () {
+                const tipoActual = txtContrasena.getAttribute('type');
+                if (tipoActual === 'password') {
+                    txtContrasena.setAttribute('type', 'text');
+                } else {
+                    txtContrasena.setAttribute('type', 'password');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

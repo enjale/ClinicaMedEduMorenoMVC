@@ -8,6 +8,16 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
     {
         public IActionResult Index()
         {
+            return RedirectToAction("Login", "Account");
+        }
+
+        public IActionResult DoctorDashboard()
+        {
+            return View();
+        }
+
+        public IActionResult EnfermeraDashboard()
+        {
             return View();
         }
 

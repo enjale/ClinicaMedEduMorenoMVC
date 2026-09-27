@@ -1,31 +1,376 @@
-html {
-  font-size: 14px;
-}
+/* ==========================================================================
+   PALETA DE COLORES - CLÍNICA MÉDICA EDUARDO MORENO
+   Extraído fielmente de ClinicaMedica.WinForms/Controles/Paleta.cs
+   ========================================================================== */
+:root {
+    --color-principal: #4F6F52;         /* rgb(79, 111, 82) */
+    --color-principal-oscuro: #3A5240;  /* rgb(58, 82, 64) */
+    --color-secundario: #6B8E7A;        /* rgb(107, 142, 122) */
+    --color-secundario-hover: #5A7867;  /* rgb(90, 120, 103) */
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
+    --color-fondo-general: #FAFAF9;     /* rgb(250, 250, 249) */
+    --color-fondo-tarjeta: #FFFFFF;
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
+    --color-texto-general: #374151;     /* rgb(55, 65, 81) */
+    --color-texto-titulo: #2F3E34;      /* rgb(47, 62, 52) */
+    --color-texto-subtitulo: #6B7280;   /* rgb(107, 114, 128) */
 
-html {
-  position: relative;
-  min-height: 100%;
+    --color-acento: #A3B18A;            /* rgb(163, 177, 138) */
+
+    --color-peligro: #D97757;           /* rgb(217, 119, 87) */
+    --color-peligro-oscuro: #BF6345;    /* rgb(191, 99, 69) */
+
+    --color-cabecera-tabla: #E7ECE8;    /* rgb(231, 236, 232) */
+    --color-fila-alterna: #F7F7F6;      /* rgb(247, 247, 246) */
+    --color-fila-hover: #F1F1F0;        /* rgb(241, 241, 240) */
+    --color-seleccion-suave: #E9E9E7;   /* rgb(233, 233, 231) */
+    --color-borde: #D6DDD8;             /* rgb(214, 221, 216) */
+
+    --color-alerta-fondo: #FAEFDA;      /* rgb(250, 238, 218) */
+    --color-alerta-texto: #633806;      /* rgb(99, 56, 6) */
+
+    --fuente-base: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 body {
-  margin-bottom: 60px;
+    font-family: var(--fuente-base);
+    color: var(--color-texto-general);
+    background-color: var(--color-fondo-general);
+    margin: 0;
+    padding: 0;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+/* ==========================================================================
+   TIPOGRAFÍA Y ENLACES GLOBALES
+   ========================================================================== */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--color-texto-titulo);
+    font-weight: 700;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+a {
+    color: var(--color-secundario);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: var(--color-principal-oscuro);
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   BARRA DE NAVEGACIÓN CORPORATIVA (NAVBAR)
+   ========================================================================== */
+.navbar-clinica {
+    background-color: var(--color-principal) !important;
+    border-bottom: 3px solid var(--color-acento) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.navbar-clinica .navbar-brand {
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: 0.5px;
+}
+
+.navbar-clinica .navbar-brand span {
+    color: var(--color-acento);
+}
+
+.navbar-clinica .nav-link {
+    color: #f3f4f6 !important;
+    font-weight: 500;
+    margin: 0 4px;
+    padding: 6px 12px !important;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.navbar-clinica .nav-link:hover {
+    color: #ffffff !important;
+    background-color: var(--color-principal-oscuro);
+}
+
+.navbar-clinica .navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* ==========================================================================
+   SOBRESCRITURA DE BOTONES DE BOOTSTRAP (ADAPTADOS A LA CLÍNICA)
+   ========================================================================== */
+.btn-primary {
+    background-color: var(--color-secundario) !important;
+    border-color: var(--color-secundario) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: var(--color-secundario-hover) !important;
+    border-color: var(--color-secundario-hover) !important;
+    color: #ffffff !important;
+}
+
+.btn-outline-primary {
+    color: var(--color-secundario) !important;
+    border-color: var(--color-secundario) !important;
+    font-weight: 600;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--color-secundario) !important;
+    border-color: var(--color-secundario) !important;
+    color: #ffffff !important;
+}
+
+.btn-danger {
+    background-color: var(--color-peligro) !important;
+    border-color: var(--color-peligro) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+}
+
+.btn-danger:hover, .btn-danger:focus {
+    background-color: var(--color-peligro-oscuro) !important;
+    border-color: var(--color-peligro-oscuro) !important;
+    color: #ffffff !important;
+}
+
+/* ==========================================================================
+   SOBRESCRITURA DE FORMULARIOS E INPUTS
+   ========================================================================== */
+.form-control:focus, .form-select:focus {
+    border-color: var(--color-secundario) !important;
+    box-shadow: 0 0 0 0.25rem rgba(107, 142, 122, 0.25) !important;
+}
+
+.form-label, label.control-label {
+    font-weight: 600;
+    color: var(--color-texto-general);
+    margin-bottom: 0.35rem;
+}
+
+/* ==========================================================================
+   TABLAS CORPORATIVAS (LISTADOS DE PACIENTES, EXPEDIENTES, ETC.)
+   ========================================================================== */
+.table {
+    background-color: #ffffff;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--color-borde);
+}
+
+.table thead th {
+    background-color: var(--color-cabecera-tabla) !important;
+    color: var(--color-texto-titulo) !important;
+    font-weight: 700;
+    border-bottom: 2px solid var(--color-borde) !important;
+    padding: 0.85rem;
+}
+
+.table tbody tr:hover {
+    background-color: var(--color-fila-hover) !important;
+}
+
+.table td {
+    padding: 0.8rem;
+    vertical-align: middle;
+    color: var(--color-texto-general);
+}
+
+/* ==========================================================================
+   ESTILOS PANTALLA LOGIN (CALCADO DE FrmLogin.cs)
+   ========================================================================== */
+.login-wrapper {
+    display: flex;
+    min-height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-fondo-general);
+}
+
+/* Panel Lateral Verde */
+.login-lateral {
+    background-color: var(--color-principal);
+    width: 32%;
+    min-width: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2.5rem 2rem;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+}
+
+.login-subtitulo-clinica {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-acento);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.login-nombre-clinica {
+    font-size: 2.1rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 1.25rem 0;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.login-linea-divisoria {
+    width: 100px;
+    height: 4px;
+    background-color: var(--color-acento);
+    border-radius: 2px;
+    margin-bottom: 1.5rem;
+}
+
+.login-descripcion-sistema {
+    font-size: 0.95rem;
+    color: #ffffff;
+    opacity: 0.95;
+    text-align: center;
+    max-width: 250px;
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* Panel Derecho (Contenido del Formulario) */
+.login-derecho {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--color-fondo-general);
+    padding: 2rem;
+}
+
+/* Tarjeta Blanca Central */
+.login-tarjeta {
+    background-color: var(--color-fondo-tarjeta);
+    width: 100%;
+    max-width: 380px;
+    padding: 2.5rem 2.2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.login-titulo-formulario {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--color-texto-titulo);
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-form-group {
+    margin-bottom: 1.4rem;
+}
+
+.login-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--color-texto-general);
+    margin-bottom: 0.4rem;
+}
+
+.login-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.login-input {
+    width: 100%;
+    padding: 0.6rem 0.85rem;
+    font-size: 0.95rem;
+    font-family: var(--fuente-base);
+    color: var(--color-texto-general);
+    background-color: #ffffff;
+    border: 1px solid var(--color-borde);
+    border-radius: 4px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+.login-input:focus {
+    outline: none;
+    border-color: var(--color-secundario);
+    box-shadow: 0 0 0 3px rgba(107, 142, 122, 0.2);
+}
+
+.login-btn-ojo {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-texto-subtitulo);
+    font-size: 1.1rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-btn-ojo:hover {
+    color: var(--color-texto-general);
+}
+
+.login-boton-submit {
+    width: 100%;
+    padding: 0.7rem;
+    margin-top: 1rem;
+    background-color: var(--color-secundario);
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: var(--fuente-base);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.login-boton-submit:hover {
+    background-color: var(--color-secundario-hover);
+}
+
+.login-enlace-olvide {
+    display: block;
+    text-align: left;
+    margin-top: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--color-secundario);
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.login-enlace-olvide:hover {
+    color: var(--color-secundario-hover);
+}
+
+/* Responsividad para móviles */
+@media (max-width: 768px) {
+    .login-wrapper {
+        flex-direction: column;
+    }
+    .login-lateral {
+        width: 100%;
+        min-width: 100%;
+        padding: 2rem 1rem;
+    }
+    .login-derecho {
+        padding: 1.5rem 1rem;
+    }
 }

@@ -1,4 +1,5 @@
 using ClinicaMedEduardoMorenoMVCWeb.Models;
+using ClinicaMedEduardoMorenoMVCWeb.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -11,9 +12,13 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
             return RedirectToAction("Login", "Account");
         }
 
-        public IActionResult DoctorDashboard()
+        public IActionResult DoctorDashboard(string? doctorNombre)
         {
-            return View();
+            var model = new DoctorDashboardViewModel
+            {
+                NombreMedico = string.IsNullOrEmpty(doctorNombre) ? "Dr. Eduardo Moreno" : doctorNombre
+            };
+            return View(model);
         }
 
         public IActionResult EnfermeraDashboard()

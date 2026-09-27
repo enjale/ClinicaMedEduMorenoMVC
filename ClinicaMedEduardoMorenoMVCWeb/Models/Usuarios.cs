@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using ClinicaMedEduardoMorenoMVCWeb.Data;
 using ClinicaMedEduardoMorenoMVCWeb.Models;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClinicaMedEduardoMorenoMVCWeb.Models
 {
@@ -14,6 +15,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Models
         [StringLength(20)]
         public string Codigo { get; set; } = string.Empty;
 
+        [Column("Usuario")]
         [Required(ErrorMessage = "El nombre de usuario es obligatorio.")]
         [StringLength(100)]
         public string NombreUsuario { get; set; } = string.Empty;

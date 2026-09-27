@@ -1,5 +1,6 @@
 using ClinicaMedEduardoMorenoMVCWeb.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +9,10 @@ builder.Services.AddControllersWithViews();
 
 // Registrar el contexto de base de datos
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+           .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning)));
+
+
 
 
 var app = builder.Build();

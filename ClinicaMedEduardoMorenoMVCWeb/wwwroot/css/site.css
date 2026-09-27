@@ -374,3 +374,100 @@ a:hover {
         padding: 1.5rem 1rem;
     }
 }
+
+/* ==========================================================================
+   PANEL / DASHBOARD DEL DOCTOR (SIDEBAR Y HEADER)
+   ========================================================================== */
+.sidebar-clinica {
+    width: 250px;
+    min-width: 250px;
+    background-color: var(--color-principal-oscuro);
+    color: #ffffff;
+    padding: 1.5rem 1rem;
+}
+
+.sidebar-header {
+    margin-bottom: 2rem;
+    padding: 0 0.5rem;
+}
+
+.sidebar-header small {
+    color: var(--color-acento);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    display: block;
+}
+
+.sidebar-header h3 {
+    color: #ffffff;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.sidebar-menu a {
+    display: block;
+    color: rgba(255, 255, 255, 0.85);
+    padding: 0.6rem 0.8rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-radius: 4px;
+    text-decoration: none;
+    margin-bottom: 0.25rem;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-menu a:hover,
+.sidebar-menu a.active {
+    background-color: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.sidebar-section {
+    color: var(--color-acento);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    padding-left: 0.8rem;
+}
+
+.sidebar-footer {
+    padding: 0.5rem 0.8rem;
+    margin-top: auto;
+}
+
+.sidebar-footer a {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+    text-decoration: none;
+}
+
+.sidebar-footer a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+.header-doctor {
+    background-color: #2F3E34;
+    color: #ffffff;
+    padding: 0.75rem 1.5rem;
+}
+
+.header-doctor span.fw-bold {
+    font-size: 1.15rem;
+}
+
+.header-doctor span.small {
+    color: var(--color-acento);
+    font-size: 0.8rem;
+}
+
+.contenido-principal {
+    background-color: var(--color-fondo-general);
+    display: flex;
+    flex-direction: column;
+}

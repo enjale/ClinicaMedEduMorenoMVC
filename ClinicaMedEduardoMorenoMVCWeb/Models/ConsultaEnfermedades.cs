@@ -1,9 +1,13 @@
+using Microsoft.AspNetCore.Mvc;
+using ClinicaMedEduardoMorenoMVCWeb.Data;
+using ClinicaMedEduardoMorenoMVCWeb.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace ClinicaMedEduardoMorenoMVCWeb.Models
 {
     public class ConsultaEnfermedades
     {
+        [Key]
         public int ConsultaEnfermedadId { get; set; }
 
         [Required(ErrorMessage = "La consulta es obligatoria")]

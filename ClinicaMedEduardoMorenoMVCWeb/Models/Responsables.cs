@@ -19,6 +19,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Models
         public string Nombre { get; set; } = string.Empty;
 
         [StringLength(10, ErrorMessage = "El DUI no puede tener más de 10 caracteres.")]
+        [RegularExpression(@"^\d{8}-\d{1}$", ErrorMessage = "El formato del DUI no es válido (ej. 12345678-9)")]
         public string? DUI { get; set; }
 
         [Required(ErrorMessage = "El parentesco es obligatorio.")]
@@ -27,6 +28,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Models
 
         [StringLength(20)]
         [Display(Name = "Teléfono")]
+        [Phone(ErrorMessage = "El formato del teléfono no es válido")]
         public string? Telefono { get; set; }
 
         [StringLength(250)]

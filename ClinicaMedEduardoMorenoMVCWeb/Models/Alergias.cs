@@ -1,9 +1,13 @@
+using Microsoft.AspNetCore.Mvc;
+using ClinicaMedEduardoMorenoMVCWeb.Data;
+using ClinicaMedEduardoMorenoMVCWeb.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace ClinicaMedEduardoMorenoMVCWeb.Models
 {
     public class Alergias
     {
+        [Key]
         public int AlergiaId { get; set; }
 
         [Required(ErrorMessage = "El nombre de la alergia es obligatorio")]

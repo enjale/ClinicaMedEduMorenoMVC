@@ -1,9 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
+using ClinicaMedEduardoMorenoMVCWeb.Data;
+using ClinicaMedEduardoMorenoMVCWeb.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace ClinicaMedEduardoMorenoMVCWeb.Models
 {
     public class RecetaDetalle
     {
+        [Key]
         public int RecetaDetalleId { get; set; }
 
         [Required(ErrorMessage = "El id de la receta es obligatorio")]
@@ -17,7 +21,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Models
         [Required(ErrorMessage = "El orden es obligatorio")]
         public byte Orden { get; set; } = 1;
 
-        [Required(ErrorMessage = "El código es obligatorio")]
+        [Required(ErrorMessage = "La prescripción es obligatoria")]
         [StringLength(200)]
         public string Prescripcion { get; set; } = string.Empty;
 

@@ -1,9 +1,13 @@
+using Microsoft.AspNetCore.Mvc;
+using ClinicaMedEduardoMorenoMVCWeb.Data;
+using ClinicaMedEduardoMorenoMVCWeb.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace ClinicaMedEduardoMorenoMVCWeb.Models
 {
     public class Antecedentes
     {
+        [Key]
         public int AntecedentesId { get; set; }
 
         [Required(ErrorMessage = "El tipo de antecedente es obligatorio")]

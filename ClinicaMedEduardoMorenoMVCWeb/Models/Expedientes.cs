@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using ClinicaMedEduardoMorenoMVCWeb.Data;
 using ClinicaMedEduardoMorenoMVCWeb.Models;
 using System.ComponentModel.DataAnnotations;
@@ -8,6 +8,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Models
 {
     public class Expedientes
     {
+        [Key]
         public int ExpedienteId { get; set; }
 
         [Required(ErrorMessage = "El paciente es obligatorio")]

@@ -1,10 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using Microsoft.AspNetCore.Mvc;
+using ClinicaMedEduardoMorenoMVCWeb.Data;
+using ClinicaMedEduardoMorenoMVCWeb.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace ClinicaMedEduardoMorenoMVCWeb.Models
 {
     public class ContactoEmergencia
     {
+        [Key]
         public int ContactoEmergenciaId { get; set; }
         public int PacienteId { get; set; }
 
@@ -15,9 +18,11 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Models
         public string Relacion {  get; set; } = string.Empty;
 
         [Required(ErrorMessage = "El telefono es obligatorio")]
+        [Phone(ErrorMessage = "El formato del teléfono no es válido")]
         public string Telefono {  get; set; } = string.Empty;
 
         [Required(ErrorMessage = "El telefono alterno obligatorio")]
+        [Phone(ErrorMessage = "El formato del teléfono alterno no es válido")]
         public string TelefonoAlterno {  get; set; } = string.Empty;
 
         [Required(ErrorMessage = "La direccion es obligatoria")]

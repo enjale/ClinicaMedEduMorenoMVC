@@ -1,9 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
+using ClinicaMedEduardoMorenoMVCWeb.Data;
+using ClinicaMedEduardoMorenoMVCWeb.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace ClinicaMedEduardoMorenoMVCWeb.Models
 {
     public class Consultas
     {
+        [Key]
         public int ConsultaId { get; set; }
 
         [Required(ErrorMessage = "El expediente es obligatorio")]
@@ -41,6 +45,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Models
         public decimal VitalPeso { get; set; }
 
         [Required(ErrorMessage = "La temperatura es obligatoria")]
+        [Range(30, 45, ErrorMessage = "Ingrese una temperatura válida")]
         public decimal VitalTemperatura { get; set; }
 
         [Required(ErrorMessage = "El estado es obligatorio")]

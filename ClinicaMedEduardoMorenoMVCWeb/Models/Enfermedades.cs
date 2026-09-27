@@ -1,9 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
+using ClinicaMedEduardoMorenoMVCWeb.Data;
+using ClinicaMedEduardoMorenoMVCWeb.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace ClinicaMedEduardoMorenoMVCWeb.Models
 {
     public class Enfermedades
     {
+        [Key]
         public int EnfermedadId { get; set; }
 
         [Required(ErrorMessage = "El código es obligatorio")]

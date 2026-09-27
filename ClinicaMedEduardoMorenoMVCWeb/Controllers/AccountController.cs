@@ -54,7 +54,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
             // Redirección según rol: si es Enfermera a su panel, si es Doctor/otro a DoctorDashboard
             if (usuario.Rol != null && usuario.Rol.Equals("Enfermera", StringComparison.OrdinalIgnoreCase))
             {
-                return RedirectToAction("EnfermeraDashboard", "Home");
+                return RedirectToAction("EnfermeraDashboard", "Home", new { enfermera = usuario.Nombre });
             }
 
             return RedirectToAction("DoctorDashboard", "Home", new { doctorNombre = usuario.Nombre });

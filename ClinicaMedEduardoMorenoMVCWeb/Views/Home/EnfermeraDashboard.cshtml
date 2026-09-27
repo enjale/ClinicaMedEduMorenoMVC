@@ -1,5 +1,58 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@model ClinicaMedEduardoMorenoMVCWeb.Models.ViewModels.EnfermeraDashboardViewModel
 @{
+    Layout = null;
+    ViewData["Title"] = "Inicio - Clínica Médica";
+    ViewData["Seccion"] = "Panel Principal";
 }
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+
+<body class="d-flex min-vh-100">
+    <!--Barra Lateral Izquierda-->
+    <aside class="sidebar-clinica d-flex flex-column">
+
+        <!--Logo Clinica-->
+        <div class="sidebar-header">
+            <small>CLINICA MEDICA</small>
+            <h3>Eduardo Moreno</h3>
+        </div>
+
+        <!--Menu Barras Laterales-->
+        <nav class="sidebar-menu flex-grow-1">
+            <a asp-controller="Expedientes" asp-action="Index">Expedientes Clinicos</a>
+            <a asp-controller="Consultas" asp-action="Index">Consultas Medicas</a>
+        </nav>
+
+        <!--Cierre De Sesion-->
+        <div class="sidebar-footer">
+            <a asp-controller="Account" asp-action="Login">Cerrar Sesion</a>
+        </div>
+    </aside>
+
+    <!--Contenido de derecha-->
+    <main class="contenido-principal flex-grow-1">
+
+        <!--Barra Superior Verde con Datos De La Enfermera-->
+        <header class="header-doctor text-end">
+            <!-- Título dinámico que muestra la sección actual -->
+            <span class="fw-bold d-block">@(ViewData["Seccion"] ?? "Panel Principal")</span>
+            <span class="d-block small">@(string.IsNullOrEmpty(Model?.NombreEnfermera) ? "Enfermera" : Model.NombreEnfermera) · Enfermera</span>
+        </header>
+
+        <!-- Área de inicio en blanco -->
+        <div class="p-4">
+
+        </div>
+
+    </main>
+
+</body>
+</html>

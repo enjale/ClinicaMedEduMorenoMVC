@@ -21,9 +21,13 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
             return View(model);
         }
 
-        public IActionResult EnfermeraDashboard()
+        public IActionResult EnfermeraDashboard(string? enfermera)
         {
-            return View();
+            var model = new EnfermeraDashboardViewModel
+            {
+                NombreEnfermera = string.IsNullOrEmpty(enfermera) ? "Enfermera" : enfermera
+            };
+            return View(model);
         }
 
         public IActionResult Privacy()

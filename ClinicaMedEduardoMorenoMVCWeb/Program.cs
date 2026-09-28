@@ -12,8 +12,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
            .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning)));
 
-
-
+// Configuración del servicio de correo con MailKit
+builder.Services.Configure<ClinicaMedEduardoMorenoMVCWeb.Models.EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<ClinicaMedEduardoMorenoMVCWeb.Services.IEmailService, ClinicaMedEduardoMorenoMVCWeb.Services.EmailService>();
+builder.Services.AddDataProtection();
 
 var app = builder.Build();
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ClinicaMedEduardoMorenoMVCWeb.Models;
 using ClinicaMedEduardoMorenoMVCWeb.Data;
@@ -14,20 +14,65 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int pagina = 1)
         {
-            var medicamentos = _context.Medicamentos.ToList();
+            if (pagina < 1) pagina = 1;
+            int tamañoPagina = 10;
+            var totalRegistros = _context.Medicamentos.Count();
+            var totalPaginas = (int)Math.Ceiling((double)totalRegistros / tamañoPagina);
+            if (totalPaginas == 0) totalPaginas = 1;
+
+            if (pagina > totalPaginas) pagina = totalPaginas;
+
+            var medicamentos = _context.Medicamentos
+                .OrderBy(m => m.MedicamentoId)
+                .Skip((pagina - 1) * tamañoPagina)
+                .Take(tamañoPagina)
+                .ToList();
+
+            ViewBag.PaginaActual = pagina;
+            ViewBag.TotalPaginas = totalPaginas;
+            ViewBag.TotalRegistros = totalRegistros;
+            ViewBag.TamañoPagina = tamañoPagina;
+
             return View(medicamentos);
+        }
+
+        private string GenerarSiguienteCodigo()
+        {
+            var codigos = _context.Medicamentos.Select(m => m.Codigo).ToList();
+            int maxNumero = 0;
+
+            foreach (var cod in codigos)
+            {
+                if (string.IsNullOrWhiteSpace(cod)) continue;
+                var match = System.Text.RegularExpressions.Regex.Match(cod, @"\d+");
+                if (match.Success && int.TryParse(match.Value, out int num))
+                {
+                    if (num > maxNumero) maxNumero = num;
+                }
+            }
+
+            int siguienteNumero = maxNumero + 1;
+            return $"MED-{siguienteNumero:D3}";
         }
 
         public IActionResult Create()
         {
-            return View();
+            var medicamento = new Medicamentos
+            {
+                Codigo = GenerarSiguienteCodigo()
+            };
+            return View(medicamento);
         }
 
         [HttpPost]
         public IActionResult Create(Medicamentos medicamento)
         {
+            // Asignar el código automáticamente para garantizar consistencia y correlatividad
+            medicamento.Codigo = GenerarSiguienteCodigo();
+            ModelState.Remove(nameof(medicamento.Codigo));
+
             if (ModelState.IsValid)
             {
                 _context.Medicamentos.Add(medicamento);
@@ -71,6 +116,16 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
             {
                 return NotFound();
             }
+
+            var medExistente = _context.Medicamentos.AsNoTracking().FirstOrDefault(m => m.MedicamentoId == id);
+            if (medExistente == null)
+            {
+                return NotFound();
+            }
+
+            // El código es fijo y no debe modificarse
+            medicamento.Codigo = medExistente.Codigo;
+            ModelState.Remove(nameof(medicamento.Codigo));
 
             if (ModelState.IsValid)
             {

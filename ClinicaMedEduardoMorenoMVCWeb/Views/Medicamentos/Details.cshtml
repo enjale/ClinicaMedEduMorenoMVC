@@ -1,23 +1,37 @@
-﻿@model ClinicaMedEduardoMorenoMVCWeb.Models.Medicamentos
+@model ClinicaMedEduardoMorenoMVCWeb.Models.Medicamentos
 
 @{
+    Layout = "_LayoutDoctor";
     ViewData["Title"] = "Detalles de Medicamento";
+    ViewData["Seccion"] = "Medicamentos";
 }
 
-<h1>Detalles de Medicamento</h1>
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card-clinica">
+            <div class="card-clinica-header">
+                <div>
+                    <h2 class="card-clinica-titulo">Detalles del Medicamento</h2>
+                    <div class="card-clinica-subtitulo">Información registrada en el sistema</div>
+                </div>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
+            </div>
 
-<div>
-    <dl class="row">
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Codigo)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.Codigo)</dd>
+            <div class="bg-light p-3 rounded mb-4 border">
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted fw-bold">@Html.DisplayNameFor(model => model.Codigo):</div>
+                    <div class="col-sm-8"><span class="badge-codigo">@Model.Codigo</span></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4 text-muted fw-bold">@Html.DisplayNameFor(model => model.Nombre):</div>
+                    <div class="col-sm-8 fw-semibold">@Model.Nombre</div>
+                </div>
+            </div>
 
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Nombre)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.Nombre)</dd>
-    </dl>
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                <a asp-action="Index" class="btn btn-outline-secondary">Volver al listado</a>
+                <a asp-action="Edit" asp-route-id="@Model.MedicamentoId" class="btn btn-primary shadow-sm">Editar Medicamento</a>
+            </div>
+        </div>
+    </div>
 </div>
-
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.MedicamentoId" class="btn btn-primary">Editar</a>
-    <a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
-</div>
-

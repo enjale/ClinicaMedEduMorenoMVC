@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ClinicaMedEduardoMorenoMVCWeb.Models;
 using ClinicaMedEduardoMorenoMVCWeb.Data;
@@ -16,7 +16,8 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            var recetas = _context.Recetas.ToList();
+            return View(recetas);
         }
 
         public IActionResult Create()
@@ -40,18 +41,73 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
 
         public IActionResult Details(int id)
         {
-            return View();
+            var receta = _context.Recetas
+                .FirstOrDefault(r => r.RecetaId == id);
+
+            if (receta == null)
+            {
+                return NotFound();
+            }
+
+            return View(receta);
         }
 
         public IActionResult Edit(int id)
         {
-            return View();
+            var receta = _context.Recetas.Find(id);
+
+            if (receta == null)
+            {
+                return NotFound();
+            }
+
+            return View(receta);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(int id, Recetas receta)
+        {
+            if (id != receta.RecetaId)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                _context.Update(receta);
+                _context.SaveChanges();
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(receta);
         }
 
         public IActionResult Delete(int id)
         {
-            return View();
+            var receta = _context.Recetas
+                .FirstOrDefault(r => r.RecetaId == id);
+
+            if (receta == null)
+            {
+                return NotFound();
+            }
+
+            return View(receta);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            var receta = _context.Recetas.Find(id);
+
+            if (receta != null)
+            {
+                _context.Recetas.Remove(receta);
+                _context.SaveChanges();
+            }
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }
-

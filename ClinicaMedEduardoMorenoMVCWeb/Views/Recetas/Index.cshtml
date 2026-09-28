@@ -1,14 +1,15 @@
-﻿@model IEnumerable<ClinicaMedEduardoMorenoMVCWeb.Models.Recetas>
+@model IEnumerable<ClinicaMedEduardoMorenoMVCWeb.Models.Recetas>
 
 @{
+    Layout = "_LayoutDoctor";
     ViewData["Title"] = "Recetas";
+    ViewData["Seccion"] = "Recetas";
 }
 
-<h1>Recetas</h1>
-
-<p>
-    <a asp-action="Create" class="btn btn-primary">Nueva Receta</a>
-</p>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Recetas</h1>
+    <a asp-action="Create" class="btn btn-primary">+ Nueva Receta</a>
+</div>
 
 <table class="table table-striped">
     <thead>
@@ -28,7 +29,7 @@
                 <td>@Html.DisplayFor(modelItem => item.ConsultaId)</td>
                 <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
                 <td>@Html.DisplayFor(modelItem => item.Medico)</td>
-                <td>
+                <td class="text-end">
                     <a asp-action="Details" asp-route-id="@item.RecetaId" class="btn btn-sm btn-outline-secondary">Detalles</a>
                     <a asp-action="Edit" asp-route-id="@item.RecetaId" class="btn btn-sm btn-outline-primary">Editar</a>
                     <a asp-action="Delete" asp-route-id="@item.RecetaId" class="btn btn-sm btn-outline-danger">Eliminar</a>

@@ -1,43 +1,54 @@
-﻿@model ClinicaMedEduardoMorenoMVCWeb.Models.RecetaDetalle
+@model ClinicaMedEduardoMorenoMVCWeb.Models.RecetaDetalle
 
 @{
+    Layout = "_LayoutDoctor";
     ViewData["Title"] = "Eliminar Detalle de Receta";
+    ViewData["Seccion"] = "Detalles de Recetas";
     var medicamento = ViewBag.Medicamento as ClinicaMedEduardoMorenoMVCWeb.Models.Medicamentos;
 }
 
-<h1>Eliminar Detalle de Receta</h1>
+<div class="mb-3">
+    <h1>Eliminar Detalle de Receta</h1>
+    <a asp-action="Index" class="text-muted small">← Volver a la lista</a>
+</div>
 
-<h3>¿Estás seguro de que deseas eliminar este detalle de receta?</h3>
-<div>
-    <dl class="row">
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.RecetaId)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.RecetaId)</dd>
+<hr />
+<div class="alert alert-danger" role="alert">
+    ¿Está seguro que desea eliminar este detalle de receta? Esta acción no se puede deshacer.
+</div>
 
-        <dt class="col-sm-3">Medicamento</dt>
-        <dd class="col-sm-9">
-            @if (medicamento != null)
-            {
-                @($"{medicamento.Codigo} - {medicamento.Nombre}")
-            }
-            else
-            {
-                @Model.MedicamentoId
-            }
-        </dd>
+<div class="row">
+    <div class="col-md-6">
+        <dl class="row">
+            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.RecetaId)</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.RecetaId)</dd>
 
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Orden)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.Orden)</dd>
+            <dt class="col-sm-4">Medicamento</dt>
+            <dd class="col-sm-8">
+                @if (medicamento != null)
+                {
+                    @($"{medicamento.Codigo} - {medicamento.Nombre}")
+                }
+                else
+                {
+                    @Model.MedicamentoId
+                }
+            </dd>
 
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Prescripcion)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.Prescripcion)</dd>
+            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Orden)</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.Orden)</dd>
 
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Cantidad)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.Cantidad)</dd>
-    </dl>
+            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Prescripcion)</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.Prescripcion)</dd>
 
-    <form asp-action="Delete" method="post">
-        <input type="hidden" asp-for="RecetaDetalleId" />
-        <input type="submit" value="Eliminar" class="btn btn-danger" />
-        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-    </form>
+            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Cantidad)</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.Cantidad)</dd>
+        </dl>
+
+        <form asp-action="Delete" method="post">
+            <input type="hidden" asp-for="RecetaDetalleId" />
+            <input type="submit" value="Confirmar Eliminación" class="btn btn-danger" />
+            <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+        </form>
+    </div>
 </div>

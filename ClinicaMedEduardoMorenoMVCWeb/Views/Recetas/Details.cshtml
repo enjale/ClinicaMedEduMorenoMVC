@@ -1,28 +1,36 @@
-﻿@model ClinicaMedEduardoMorenoMVCWeb.Models.Recetas
+@model ClinicaMedEduardoMorenoMVCWeb.Models.Recetas
 
 @{
+    Layout = "_LayoutDoctor";
     ViewData["Title"] = "Detalles de Receta";
+    ViewData["Seccion"] = "Recetas";
 }
 
-<h1>Detalles de Receta</h1>
-
-<div>
-    <dl class="row">
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Codigo)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.Codigo)</dd>
-
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ConsultaId)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.ConsultaId)</dd>
-
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Fecha)</dt>
-        <dd class="col-sm-9">@Model.Fecha.ToString("dd/MM/yyyy")</dd>
-
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Medico)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.Medico)</dd>
-    </dl>
+<div class="mb-3">
+    <h1>Detalles de Receta</h1>
+    <a asp-action="Index" class="text-muted small">← Volver a la lista</a>
 </div>
 
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.RecetaId" class="btn btn-primary">Editar</a>
-    <a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <dl class="row">
+            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Codigo)</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.Codigo)</dd>
+
+            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.ConsultaId)</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.ConsultaId)</dd>
+
+            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Fecha)</dt>
+            <dd class="col-sm-8">@Model.Fecha.ToString("dd/MM/yyyy")</dd>
+
+            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Medico)</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.Medico)</dd>
+        </dl>
+
+        <div class="mt-4">
+            <a asp-action="Edit" asp-route-id="@Model.RecetaId" class="btn btn-primary">Editar</a>
+            <a asp-action="Index" class="btn btn-secondary ms-2">Volver a la lista</a>
+        </div>
+    </div>
 </div>

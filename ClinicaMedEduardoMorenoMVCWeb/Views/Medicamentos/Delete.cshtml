@@ -1,22 +1,42 @@
-﻿@model ClinicaMedEduardoMorenoMVCWeb.Models.Medicamentos
+@model ClinicaMedEduardoMorenoMVCWeb.Models.Medicamentos
 
 @{
-    ViewData["Title"] = "Detalles de Medicamento";
+    Layout = "_LayoutDoctor";
+    ViewData["Title"] = "Eliminar Medicamento";
+    ViewData["Seccion"] = "Medicamentos";
 }
 
-<h1>Detalles de Medicamento</h1>
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card-clinica">
+            <div class="card-clinica-header">
+                <div>
+                    <h2 class="card-clinica-titulo text-danger">Eliminar Medicamento</h2>
+                    <div class="card-clinica-subtitulo">Confirme si desea remover este medicamento del catálogo</div>
+                </div>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
+            </div>
 
-<div>
-    <dl class="row">
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Codigo)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.Codigo)</dd>
+            <div class="alert alert-warning border-0 shadow-sm mb-4" role="alert">
+                <strong>Atención:</strong> ¿Está seguro que desea eliminar este medicamento? Esta acción no se puede deshacer.
+            </div>
 
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Nombre)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.Nombre)</dd>
-    </dl>
-</div>
+            <div class="bg-light p-3 rounded mb-4 border">
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted fw-bold">@Html.DisplayNameFor(model => model.Codigo):</div>
+                    <div class="col-sm-8"><span class="badge-codigo">@Model.Codigo</span></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4 text-muted fw-bold">@Html.DisplayNameFor(model => model.Nombre):</div>
+                    <div class="col-sm-8 fw-semibold">@Model.Nombre</div>
+                </div>
+            </div>
 
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.MedicamentoId" class="btn btn-primary">Editar</a>
-    <a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
+            <form asp-action="Delete" method="post" class="d-flex justify-content-end gap-2 pt-3 border-top">
+                <input type="hidden" asp-for="MedicamentoId" />
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-danger shadow-sm">Confirmar Eliminación</button>
+            </form>
+        </div>
+    </div>
 </div>

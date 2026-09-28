@@ -1,16 +1,21 @@
-﻿@model ClinicaMedEduardoMorenoMVCWeb.Models.RecetaDetalle
+@model ClinicaMedEduardoMorenoMVCWeb.Models.RecetaDetalle
 
 @{
+    Layout = "_LayoutDoctor";
     ViewData["Title"] = "Crear Detalle de Receta";
+    ViewData["Seccion"] = "Detalles de Recetas";
 }
 
-<h1>Crear Detalle de Receta</h1>
+<div class="mb-3">
+    <h1>Crear Detalle de Receta</h1>
+    <a asp-action="Index" class="text-muted small">← Volver a la lista</a>
+</div>
 
 <hr />
 <div class="row">
     <div class="col-md-6">
         <form asp-action="Create" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <div class="form-group mb-3">
                 <label asp-for="RecetaId" class="control-label"></label>
@@ -26,25 +31,25 @@
 
             <div class="form-group mb-3">
                 <label asp-for="Orden" class="control-label"></label>
-                <input asp-for="Orden" class="form-control" />
+                <input asp-for="Orden" class="form-control" min="1" />
                 <span asp-validation-for="Orden" class="text-danger"></span>
             </div>
 
             <div class="form-group mb-3">
                 <label asp-for="Prescripcion" class="control-label"></label>
-                <textarea asp-for="Prescripcion" class="form-control"></textarea>
+                <textarea asp-for="Prescripcion" class="form-control" rows="3" placeholder="Indicaciones de uso..."></textarea>
                 <span asp-validation-for="Prescripcion" class="text-danger"></span>
             </div>
 
             <div class="form-group mb-3">
                 <label asp-for="Cantidad" class="control-label"></label>
-                <input asp-for="Cantidad" class="form-control" />
+                <input asp-for="Cantidad" class="form-control" placeholder="Ej: 1 tableta cada 8 horas" />
                 <span asp-validation-for="Cantidad" class="text-danger"></span>
             </div>
 
-            <div class="form-group">
+            <div class="form-group mt-4">
                 <input type="submit" value="Guardar" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
             </div>
         </form>
     </div>

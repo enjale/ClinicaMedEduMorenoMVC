@@ -471,3 +471,91 @@ a:hover {
     display: flex;
     flex-direction: column;
 }
+
+/* ==========================================================================
+   TARJETAS Y CONTENEDORES DE MÓDULOS (CLÍNICA)
+   ========================================================================== */
+.card-clinica {
+    background-color: var(--color-fondo-tarjeta);
+    border: 1px solid var(--color-borde);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.card-clinica-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--color-borde);
+}
+
+.card-clinica-titulo {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--color-texto-titulo);
+    margin: 0;
+}
+
+.card-clinica-subtitulo {
+    font-size: 0.85rem;
+    color: var(--color-texto-subtitulo);
+    margin-top: 0.25rem;
+}
+
+/* Insignias / Badges de Código */
+.badge-codigo {
+    background-color: var(--color-cabecera-tabla);
+    color: var(--color-principal-oscuro);
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 4px;
+    border: 1px solid var(--color-borde);
+}
+
+/* ==========================================================================
+   PAGINACIÓN ESTILO CLÍNICA
+   ========================================================================== */
+.pagination-clinica .page-link {
+    color: var(--color-texto-general);
+    background-color: #ffffff;
+    border: 1px solid var(--color-borde);
+    padding: 0.45rem 0.85rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.pagination-clinica .page-link:hover {
+    color: var(--color-principal-oscuro);
+    background-color: var(--color-cabecera-tabla);
+    border-color: var(--color-secundario);
+}
+
+.pagination-clinica .page-item.active .page-link {
+    color: #ffffff !important;
+    background-color: var(--color-principal) !important;
+    border-color: var(--color-principal) !important;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(79, 111, 82, 0.35);
+}
+
+.pagination-clinica .page-item.disabled .page-link {
+    color: #9ca3af;
+    background-color: #f9fafb;
+    border-color: var(--color-borde);
+    cursor: not-allowed;
+}
+
+.pagination-info {
+    font-size: 0.875rem;
+    color: var(--color-texto-subtitulo);
+}
+
+.pagination-info strong {
+    color: var(--color-texto-titulo);
+}

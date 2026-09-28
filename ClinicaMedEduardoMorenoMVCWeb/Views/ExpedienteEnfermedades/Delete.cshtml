@@ -1,30 +1,41 @@
-﻿@model ClinicaMedEduardoMorenoMVCWeb.Models.ExpedienteEnfermedades
+@model ClinicaMedEduardoMorenoMVCWeb.Models.ExpedienteEnfermedades
 
 @{
+    Layout = "_LayoutDoctor";
     ViewData["Title"] = "Eliminar Expediente de Enfermedad";
+    ViewData["Seccion"] = "Expediente de Enfermedades";
 }
 
-<h1>Eliminar Expediente de Enfermedad</h1>
+<div class="mb-3">
+    <h1>Eliminar Expediente de Enfermedad</h1>
+    <a asp-action="Index" class="text-muted small">← Volver a la lista</a>
+</div>
 
-<h3>¿Estás seguro de que deseas eliminar este registro?</h3>
-<div>
-    <dl class="row">
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ExpedienteId)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.ExpedienteId)</dd>
+<hr />
+<div class="alert alert-danger" role="alert">
+    ¿Está seguro que desea eliminar este registro? Esta acción no se puede deshacer.
+</div>
 
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.EnfermedadId)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.EnfermedadId)</dd>
+<div class="row">
+    <div class="col-md-6">
+        <dl class="row">
+            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.ExpedienteId)</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.ExpedienteId)</dd>
 
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.FechaDeteccion)</dt>
-        <dd class="col-sm-9">@Model.FechaDeteccion.ToString("dd/MM/yyyy")</dd>
+            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.EnfermedadId)</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.EnfermedadId)</dd>
 
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Observaciones)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.Observaciones)</dd>
-    </dl>
+            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.FechaDeteccion)</dt>
+            <dd class="col-sm-8">@Model.FechaDeteccion.ToString("dd/MM/yyyy")</dd>
 
-    <form asp-action="Delete" method="post">
-        <input type="hidden" asp-for="ExpedienteEnfermedadId" />
-        <input type="submit" value="Eliminar" class="btn btn-danger" />
-        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-    </form>
+            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Observaciones)</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.Observaciones)</dd>
+        </dl>
+
+        <form asp-action="Delete" method="post">
+            <input type="hidden" asp-for="ExpedienteEnfermedadId" />
+            <input type="submit" value="Confirmar Eliminación" class="btn btn-danger" />
+            <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+        </form>
+    </div>
 </div>

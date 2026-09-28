@@ -1,28 +1,36 @@
-﻿@model ClinicaMedEduardoMorenoMVCWeb.Models.ExpedienteEnfermedades
+@model ClinicaMedEduardoMorenoMVCWeb.Models.ExpedienteEnfermedades
 
 @{
+    Layout = "_LayoutDoctor";
     ViewData["Title"] = "Detalles de Expediente de Enfermedad";
+    ViewData["Seccion"] = "Expediente de Enfermedades";
 }
 
-<h1>Detalles de Expediente de Enfermedad</h1>
-
-<div>
-    <dl class="row">
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ExpedienteId)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.ExpedienteId)</dd>
-
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.EnfermedadId)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.EnfermedadId)</dd>
-
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.FechaDeteccion)</dt>
-        <dd class="col-sm-9">@Model.FechaDeteccion.ToString("dd/MM/yyyy")</dd>
-
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Observaciones)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.Observaciones)</dd>
-    </dl>
+<div class="mb-3">
+    <h1>Detalles de Expediente de Enfermedad</h1>
+    <a asp-action="Index" class="text-muted small">← Volver a la lista</a>
 </div>
 
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.ExpedienteEnfermedadId" class="btn btn-primary">Editar</a>
-    <a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <dl class="row">
+            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.ExpedienteId)</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.ExpedienteId)</dd>
+
+            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.EnfermedadId)</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.EnfermedadId)</dd>
+
+            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.FechaDeteccion)</dt>
+            <dd class="col-sm-8">@Model.FechaDeteccion.ToString("dd/MM/yyyy")</dd>
+
+            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Observaciones)</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.Observaciones)</dd>
+        </dl>
+
+        <div class="mt-4">
+            <a asp-action="Edit" asp-route-id="@Model.ExpedienteEnfermedadId" class="btn btn-primary">Editar</a>
+            <a asp-action="Index" class="btn btn-secondary ms-2">Volver a la lista</a>
+        </div>
+    </div>
 </div>

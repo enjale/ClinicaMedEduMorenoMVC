@@ -1,0 +1,65 @@
+@model ClinicaMedEduardoMorenoMVCWeb.Models.ViewModels.ConsultaDetalleViewModel
+
+@{
+    Layout = "_LayoutDoctor";
+    ViewData["Title"] = "Eliminar Consulta";
+    ViewData["Seccion"] = "Consultas Médicas";
+    var c = Model.Consulta;
+    bool tieneRecetas = ViewBag.TieneRecetas ?? false;
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card-clinica">
+            <div class="card-clinica-header">
+                <div>
+                    <h2 class="card-clinica-titulo text-danger">Eliminar Consulta</h2>
+                    <div class="card-clinica-subtitulo">Confirme si desea remover esta consulta del sistema</div>
+                </div>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
+            </div>
+
+            @if (tieneRecetas)
+            {
+                <div class="alert alert-danger border-0 shadow-sm mb-4" role="alert">
+                    <strong>No se puede eliminar:</strong> esta consulta tiene recetas asociadas. Elimine primero las recetas.
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning border-0 shadow-sm mb-4" role="alert">
+                    <strong>Atención:</strong> ¿Está seguro que desea eliminar esta consulta? También se eliminarán los
+                    @Model.Enfermedades.Count padecimiento(s) asignado(s). Esta acción no se puede deshacer.
+                </div>
+            }
+
+            <div class="bg-light p-3 rounded mb-4 border">
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted fw-bold">@Html.DisplayNameFor(m => m.Consulta.Codigo):</div>
+                    <div class="col-sm-8"><span class="badge-codigo">@c.Codigo</span></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted fw-bold">Paciente:</div>
+                    <div class="col-sm-8 fw-semibold">@Model.NombrePaciente</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted fw-bold">@Html.DisplayNameFor(m => m.Consulta.Fecha):</div>
+                    <div class="col-sm-8">@c.Fecha.ToString("dd/MM/yyyy")</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4 text-muted fw-bold">@Html.DisplayNameFor(m => m.Consulta.Motivo):</div>
+                    <div class="col-sm-8">@c.Motivo</div>
+                </div>
+            </div>
+
+            <form asp-action="Delete" method="post" class="d-flex justify-content-end gap-2 pt-3 border-top">
+                <input type="hidden" name="id" value="@c.ConsultaId" />
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                @if (!tieneRecetas)
+                {
+                    <button type="submit" class="btn btn-danger shadow-sm">Confirmar Eliminación</button>
+                }
+            </form>
+        </div>
+    </div>
+</div>

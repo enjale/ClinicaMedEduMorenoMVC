@@ -1,0 +1,42 @@
+@model ClinicaMedEduardoMorenoMVCWeb.Models.Alergias
+
+@{
+    Layout = "_LayoutDoctor";
+    ViewData["Title"] = "Eliminar Alergia";
+    ViewData["Seccion"] = "Alergias";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card-clinica">
+            <div class="card-clinica-header">
+                <div>
+                    <h2 class="card-clinica-titulo text-danger">Eliminar Alergia</h2>
+                    <div class="card-clinica-subtitulo">Confirme si desea remover esta alergia del catálogo</div>
+                </div>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
+            </div>
+
+            <div class="alert alert-warning border-0 shadow-sm mb-4" role="alert">
+                <strong>Atención:</strong> ¿Está seguro que desea eliminar esta alergia? Esta acción no se puede deshacer.
+            </div>
+
+            <div class="bg-light p-3 rounded mb-4 border">
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted fw-bold">@Html.DisplayNameFor(model => model.Codigo):</div>
+                    <div class="col-sm-8"><span class="badge-codigo">@Model.Codigo</span></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4 text-muted fw-bold">@Html.DisplayNameFor(model => model.Nombre):</div>
+                    <div class="col-sm-8 fw-semibold">@Model.Nombre</div>
+                </div>
+            </div>
+
+            <form asp-action="Delete" method="post" class="d-flex justify-content-end gap-2 pt-3 border-top">
+                <input type="hidden" asp-for="AlergiaId" />
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-danger shadow-sm">Confirmar Eliminación</button>
+            </form>
+        </div>
+    </div>
+</div>

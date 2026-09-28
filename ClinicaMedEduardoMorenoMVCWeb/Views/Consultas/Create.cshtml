@@ -1,0 +1,47 @@
+@model ClinicaMedEduardoMorenoMVCWeb.Models.Consultas
+
+@{
+    Layout = "_LayoutDoctor";
+    ViewData["Title"] = "Nueva Consulta";
+    ViewData["Seccion"] = "Consultas Médicas";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+        <div class="card-clinica">
+            <div class="card-clinica-header">
+                <div>
+                    <h2 class="card-clinica-titulo">Nueva Consulta</h2>
+                    <div class="card-clinica-subtitulo">Registre el motivo y los signos vitales del paciente</div>
+                </div>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
+            </div>
+
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Codigo" class="form-label"></label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light text-muted" style="border-color: var(--color-borde); font-size: 0.85rem; font-weight: 600;">Auto</span>
+                        <input asp-for="Codigo" class="form-control bg-light" readonly style="cursor: not-allowed; font-weight: 600; color: var(--color-principal-oscuro);" />
+                    </div>
+                    <small class="text-muted d-block mt-1">El código se asigna automáticamente de forma correlativa.</small>
+                </div>
+
+                <partial name="_FormularioConsulta" model="Model" />
+
+                <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary shadow-sm">Guardar Consulta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

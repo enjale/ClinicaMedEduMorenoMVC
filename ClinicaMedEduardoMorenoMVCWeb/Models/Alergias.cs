@@ -15,9 +15,6 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Models
         public string Nombre { get; set; } = string.Empty;
 
         [StringLength(500)]
-        public string Descripcion { get; set; } = string.Empty;
-
-        [StringLength(50)]
-        public string Grado { get; set; } = string.Empty;
+        public string Codigo { get; set; } = string.Empty;
     }
 }

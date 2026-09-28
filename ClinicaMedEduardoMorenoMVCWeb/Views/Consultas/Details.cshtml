@@ -1,0 +1,172 @@
+@model ClinicaMedEduardoMorenoMVCWeb.Models.ViewModels.ConsultaDetalleViewModel
+
+@{
+    Layout = "_LayoutDoctor";
+    ViewData["Title"] = "Atención de Consulta";
+    ViewData["Seccion"] = "Consultas Médicas";
+    var c = Model.Consulta;
+    var enfermedadesDisponibles = (ViewBag.Enfermedades as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>) ?? new();
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+
+        <!-- Datos de la consulta -->
+        <div class="card-clinica mb-4">
+            <div class="card-clinica-header">
+                <div>
+                    <h2 class="card-clinica-titulo">Atención de Consulta <span class="badge-codigo ms-2">@c.Codigo</span></h2>
+                    <div class="card-clinica-subtitulo">Información de la consulta y signos vitales del paciente</div>
+                </div>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
+            </div>
+
+            <div class="bg-light p-3 rounded mb-3 border">
+                <div class="row mb-3">
+                    <div class="col-sm-3 text-muted fw-bold">Paciente:</div>
+                    <div class="col-sm-9 fw-semibold">
+                        @Model.NombrePaciente
+                        @if (!string.IsNullOrEmpty(Model.CodigoExpediente))
+                        {
+                            <span class="text-muted small ms-2">Expediente @Model.CodigoExpediente</span>
+                        }
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3 text-muted fw-bold">@Html.DisplayNameFor(m => m.Consulta.Fecha):</div>
+                    <div class="col-sm-3">@c.Fecha.ToString("dd/MM/yyyy")</div>
+                    <div class="col-sm-3 text-muted fw-bold">@Html.DisplayNameFor(m => m.Consulta.Estado):</div>
+                    <div class="col-sm-3"><partial name="_EstadoBadge" model="c.Estado" /></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3 text-muted fw-bold">@Html.DisplayNameFor(m => m.Consulta.Medico):</div>
+                    <div class="col-sm-3">@(string.IsNullOrEmpty(c.Medico) ? "Sin asignar" : c.Medico)</div>
+                    <div class="col-sm-3 text-muted fw-bold">@Html.DisplayNameFor(m => m.Consulta.UsuarioId):</div>
+                    <div class="col-sm-3">@Model.RegistradoPor</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3 text-muted fw-bold">@Html.DisplayNameFor(m => m.Consulta.Motivo):</div>
+                    <div class="col-sm-9" style="white-space: pre-line;">@c.Motivo</div>
+                </div>
+            </div>
+
+            <h6 class="text-muted fw-bold mb-3">Signos vitales</h6>
+            <div class="row text-center mb-3">
+                <div class="col-md-4 mb-2">
+                    <div class="border rounded p-3">
+                        <div class="text-muted small">@Html.DisplayNameFor(m => m.Consulta.VitalPeso)</div>
+                        <div class="fs-5 fw-semibold">@(c.VitalPeso?.ToString("0.##") ?? "—")</div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <div class="border rounded p-3">
+                        <div class="text-muted small">@Html.DisplayNameFor(m => m.Consulta.VitalTemperatura)</div>
+                        <div class="fs-5 fw-semibold">@(c.VitalTemperatura?.ToString("0.0") ?? "—")</div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <div class="border rounded p-3">
+                        <div class="text-muted small">@Html.DisplayNameFor(m => m.Consulta.VitalPresion)</div>
+                        <div class="fs-5 fw-semibold">@(string.IsNullOrEmpty(c.VitalPresion) ? "—" : c.VitalPresion)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                <a asp-action="Index" class="btn btn-outline-secondary">Volver al listado</a>
+                <a asp-action="Edit" asp-route-id="@c.ConsultaId" class="btn btn-primary shadow-sm">Editar Consulta</a>
+            </div>
+        </div>
+
+        <!-- Padecimientos y diagnósticos -->
+        <div class="card-clinica">
+            <div class="card-clinica-header">
+                <div>
+                    <h2 class="card-clinica-titulo">Padecimientos y Diagnósticos</h2>
+                    <div class="card-clinica-subtitulo">Enfermedades asignadas a esta consulta con su diagnóstico u observaciones</div>
+                </div>
+            </div>
+
+            @if (TempData["ErrorEnfermedad"] is string error)
+            {
+                <div class="alert alert-danger py-2 mb-3">@error</div>
+            }
+
+            <div class="table-responsive mb-4">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%;">Código</th>
+                            <th style="width: 25%;">Enfermedad</th>
+                            <th style="width: 45%;">Diagnóstico / Observaciones</th>
+                            <th style="width: 15%;" class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Enfermedades.Any())
+                        {
+                            @foreach (var item in Model.Enfermedades)
+                            {
+                                <tr>
+                                    <td><span class="badge-codigo">@item.CodigoEnfermedad</span></td>
+                                    <td class="fw-semibold">
+                                        @item.NombreEnfermedad
+                                        <div class="text-muted small">@item.TipoEnfermedad</div>
+                                    </td>
+                                    <td style="white-space: pre-line;">@(string.IsNullOrEmpty(item.Observaciones) ? "—" : item.Observaciones)</td>
+                                    <td class="text-end">
+                                        <form asp-action="QuitarEnfermedad" asp-route-id="@item.ConsultaEnfermedadId" method="post" class="d-inline"
+                                              onsubmit="return confirm('¿Desea quitar esta enfermedad de la consulta?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Quitar</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    <p class="mb-0">Aún no se han asignado padecimientos a esta consulta.</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <h6 class="text-muted fw-bold mb-3">Asignar padecimiento</h6>
+            @if (enfermedadesDisponibles.Any())
+            {
+                <form asp-action="AsignarEnfermedad" method="post" class="bg-light p-3 rounded border">
+                    <input type="hidden" name="consultaId" value="@c.ConsultaId" />
+
+                    <div class="mb-3">
+                        <label for="enfermedadId" class="form-label">Enfermedad</label>
+                        <select id="enfermedadId" name="enfermedadId" asp-items="enfermedadesDisponibles" class="form-select" required>
+                            <option value="">-- Seleccione una enfermedad --</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="observaciones" class="form-label">Diagnóstico / Observaciones</label>
+                        <textarea id="observaciones" name="observaciones" class="form-control" rows="3"
+                                  placeholder="Describa el diagnóstico, hallazgos y recomendaciones"></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary shadow-sm">+ Asignar</button>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <p class="text-muted mb-0">
+                    No hay más enfermedades disponibles en el catálogo.
+                    <a asp-controller="Enfermedades" asp-action="Create">Registrar una nueva enfermedad</a>.
+                </p>
+            }
+        </div>
+
+    </div>
+</div>

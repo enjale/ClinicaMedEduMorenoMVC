@@ -1,0 +1,13 @@
+@model string
+
+@{
+    var clase = Model switch
+    {
+        "atendida" => "bg-success",
+        "cancelada" => "bg-secondary",
+        _ => "bg-warning text-dark"
+    };
+    var texto = string.IsNullOrEmpty(Model) ? "" : char.ToUpper(Model[0]) + Model.Substring(1);
+}
+
+<span class="badge @clase">@texto</span>

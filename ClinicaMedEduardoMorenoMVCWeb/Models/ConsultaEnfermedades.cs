@@ -14,9 +14,10 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Models
         public int ConsultaId { get; set; }
 
         [Required(ErrorMessage = "La enfermedad es obligatoria")]
+        [Display(Name = "Enfermedad")]
         public int EnfermedadId { get; set; }
 
-        [StringLength(500)]
-        public string Diagnostico { get; set; } = string.Empty;
+        [Display(Name = "Diagnóstico / Observaciones")]
+        public string? Observaciones { get; set; }
     }
 }

@@ -1,0 +1,28 @@
+﻿@model ClinicaMedEduardoMorenoMVCWeb.Models.ExpedienteEnfermedades
+
+@{
+    ViewData["Title"] = "Detalles de Expediente de Enfermedad";
+}
+
+<h1>Detalles de Expediente de Enfermedad</h1>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ExpedienteId)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.ExpedienteId)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.EnfermedadId)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.EnfermedadId)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.FechaDeteccion)</dt>
+        <dd class="col-sm-9">@Model.FechaDeteccion.ToString("dd/MM/yyyy")</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Observaciones)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Observaciones)</dd>
+    </dl>
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.ExpedienteEnfermedadId" class="btn btn-primary">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
+</div>

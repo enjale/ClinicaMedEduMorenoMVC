@@ -1,0 +1,41 @@
+﻿@model ClinicaMedEduardoMorenoMVCWeb.Models.RecetaDetalle
+
+@{
+    ViewData["Title"] = "Detalle de Receta";
+    var medicamento = ViewBag.Medicamento as ClinicaMedEduardoMorenoMVCWeb.Models.Medicamentos;
+}
+
+<h1>Detalle de Receta</h1>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.RecetaId)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.RecetaId)</dd>
+
+        <dt class="col-sm-3">Medicamento</dt>
+        <dd class="col-sm-9">
+            @if (medicamento != null)
+            {
+                @($"{medicamento.Codigo} - {medicamento.Nombre}")
+            }
+            else
+            {
+                @Model.MedicamentoId
+            }
+        </dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Orden)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Orden)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Prescripcion)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Prescripcion)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Cantidad)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Cantidad)</dd>
+    </dl>
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.RecetaDetalleId" class="btn btn-primary">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
+</div>

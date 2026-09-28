@@ -1,0 +1,30 @@
+﻿@model ClinicaMedEduardoMorenoMVCWeb.Models.ExpedienteEnfermedades
+
+@{
+    ViewData["Title"] = "Eliminar Expediente de Enfermedad";
+}
+
+<h1>Eliminar Expediente de Enfermedad</h1>
+
+<h3>¿Estás seguro de que deseas eliminar este registro?</h3>
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ExpedienteId)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.ExpedienteId)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.EnfermedadId)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.EnfermedadId)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.FechaDeteccion)</dt>
+        <dd class="col-sm-9">@Model.FechaDeteccion.ToString("dd/MM/yyyy")</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Observaciones)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Observaciones)</dd>
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="ExpedienteEnfermedadId" />
+        <input type="submit" value="Eliminar" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>

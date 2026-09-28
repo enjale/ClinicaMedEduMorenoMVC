@@ -1,0 +1,52 @@
+﻿@model ClinicaMedEduardoMorenoMVCWeb.Models.ExpedienteEnfermedades
+
+@{
+    ViewData["Title"] = "Editar Expediente de Enfermedad";
+}
+
+<h1>Editar Expediente de Enfermedad</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ExpedienteEnfermedadId" />
+
+            <div class="form-group mb-3">
+                <label asp-for="ExpedienteId" class="control-label"></label>
+                <input asp-for="ExpedienteId" class="form-control" />
+                <span asp-validation-for="ExpedienteId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="EnfermedadId" class="control-label"></label>
+                <input asp-for="EnfermedadId" class="form-control" />
+                <span asp-validation-for="EnfermedadId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="FechaDeteccion" class="control-label"></label>
+                <input asp-for="FechaDeteccion" class="form-control" />
+                <span asp-validation-for="FechaDeteccion" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Observaciones" class="control-label"></label>
+                <textarea asp-for="Observaciones" class="form-control"></textarea>
+                <span asp-validation-for="Observaciones" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Guardar" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

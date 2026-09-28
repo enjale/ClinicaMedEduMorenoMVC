@@ -1,0 +1,43 @@
+﻿@model ClinicaMedEduardoMorenoMVCWeb.Models.RecetaDetalle
+
+@{
+    ViewData["Title"] = "Eliminar Detalle de Receta";
+    var medicamento = ViewBag.Medicamento as ClinicaMedEduardoMorenoMVCWeb.Models.Medicamentos;
+}
+
+<h1>Eliminar Detalle de Receta</h1>
+
+<h3>¿Estás seguro de que deseas eliminar este detalle de receta?</h3>
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.RecetaId)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.RecetaId)</dd>
+
+        <dt class="col-sm-3">Medicamento</dt>
+        <dd class="col-sm-9">
+            @if (medicamento != null)
+            {
+                @($"{medicamento.Codigo} - {medicamento.Nombre}")
+            }
+            else
+            {
+                @Model.MedicamentoId
+            }
+        </dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Orden)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Orden)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Prescripcion)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Prescripcion)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Cantidad)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Cantidad)</dd>
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="RecetaDetalleId" />
+        <input type="submit" value="Eliminar" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>

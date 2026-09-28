@@ -1,0 +1,35 @@
+﻿@model IEnumerable<ClinicaMedEduardoMorenoMVCWeb.Models.Medicamentos>
+
+@{
+    ViewData["Title"] = "Medicamentos";
+}
+
+<h1>Medicamentos</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Crear nuevo</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Codigo)</th>
+            <th>@Html.DisplayNameFor(model => model.Nombre)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Codigo)</td>
+                <td>@Html.DisplayFor(modelItem => item.Nombre)</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.MedicamentoId" class="btn btn-sm btn-outline-secondary">Detalles</a>
+                    <a asp-action="Edit" asp-route-id="@item.MedicamentoId" class="btn btn-sm btn-outline-primary">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.MedicamentoId" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

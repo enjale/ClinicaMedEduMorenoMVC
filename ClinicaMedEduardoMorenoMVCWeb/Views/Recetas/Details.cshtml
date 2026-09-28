@@ -1,0 +1,28 @@
+﻿@model ClinicaMedEduardoMorenoMVCWeb.Models.Recetas
+
+@{
+    ViewData["Title"] = "Detalles de Receta";
+}
+
+<h1>Detalles de Receta</h1>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Codigo)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Codigo)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ConsultaId)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.ConsultaId)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Fecha)</dt>
+        <dd class="col-sm-9">@Model.Fecha.ToString("dd/MM/yyyy")</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Medico)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Medico)</dd>
+    </dl>
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.RecetaId" class="btn btn-primary">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
+</div>

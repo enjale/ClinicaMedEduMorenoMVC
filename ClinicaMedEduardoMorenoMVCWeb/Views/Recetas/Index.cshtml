@@ -1,0 +1,39 @@
+﻿@model IEnumerable<ClinicaMedEduardoMorenoMVCWeb.Models.Recetas>
+
+@{
+    ViewData["Title"] = "Recetas";
+}
+
+<h1>Recetas</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nueva Receta</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Codigo)</th>
+            <th>@Html.DisplayNameFor(model => model.ConsultaId)</th>
+            <th>@Html.DisplayNameFor(model => model.Fecha)</th>
+            <th>@Html.DisplayNameFor(model => model.Medico)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Codigo)</td>
+                <td>@Html.DisplayFor(modelItem => item.ConsultaId)</td>
+                <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                <td>@Html.DisplayFor(modelItem => item.Medico)</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.RecetaId" class="btn btn-sm btn-outline-secondary">Detalles</a>
+                    <a asp-action="Edit" asp-route-id="@item.RecetaId" class="btn btn-sm btn-outline-primary">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.RecetaId" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

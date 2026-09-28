@@ -1,0 +1,39 @@
+﻿@model IEnumerable<ClinicaMedEduardoMorenoMVCWeb.Models.ExpedienteEnfermedades>
+
+@{
+    ViewData["Title"] = "Expediente de Enfermedades";
+}
+
+<h1>Expediente de Enfermedades</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Crear nuevo</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.ExpedienteId)</th>
+            <th>@Html.DisplayNameFor(model => model.EnfermedadId)</th>
+            <th>@Html.DisplayNameFor(model => model.FechaDeteccion)</th>
+            <th>@Html.DisplayNameFor(model => model.Observaciones)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.ExpedienteId)</td>
+                <td>@Html.DisplayFor(modelItem => item.EnfermedadId)</td>
+                <td>@item.FechaDeteccion.ToString("dd/MM/yyyy")</td>
+                <td>@Html.DisplayFor(modelItem => item.Observaciones)</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.ExpedienteEnfermedadId" class="btn btn-sm btn-outline-secondary">Detalles</a>
+                    <a asp-action="Edit" asp-route-id="@item.ExpedienteEnfermedadId" class="btn btn-sm btn-outline-primary">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.ExpedienteEnfermedadId" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

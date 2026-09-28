@@ -1,8 +1,13 @@
+@using Microsoft.AspNetCore.Http
 @model ClinicaMedEduardoMorenoMVCWeb.Models.ViewModels.ConsultaDetalleViewModel
 
 @{
     Layout = "_LayoutDoctor";
-    ViewData["Title"] = "Atención de Consulta";
+    var rolSesion = Context.Session.GetString("UsuarioRol");
+    var esEnfermera = (!string.IsNullOrEmpty(rolSesion) && rolSesion.Equals("Enfermera", StringComparison.OrdinalIgnoreCase))
+                      || User.IsInRole("Enfermera")
+                      || (ViewBag.EsEnfermera is bool b && b);
+    ViewData["Title"] = esEnfermera ? "Detalle de Consulta" : "Atención de Consulta";
     ViewData["Seccion"] = "Consultas Médicas";
     var c = Model.Consulta;
     var enfermedadesDisponibles = (ViewBag.Enfermedades as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>) ?? new();
@@ -12,11 +17,35 @@
 <div class="row justify-content-center">
     <div class="col-lg-10">
 
+        @if (TempData["Mensaje"] is string msg)
+        {
+            <div class="alert alert-success alert-dismissible fade show py-2 mb-3" role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2" viewBox="0 0 16 16">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                </svg>
+                @msg
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+        }
+        @if (TempData["Error"] is string err)
+        {
+            <div class="alert alert-danger alert-dismissible fade show py-2 mb-3" role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2" viewBox="0 0 16 16">
+                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                </svg>
+                @err
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+        }
+
         <!-- Datos de la consulta -->
         <div class="card-clinica mb-4">
             <div class="card-clinica-header">
                 <div>
-                    <h2 class="card-clinica-titulo">Atención de Consulta <span class="badge-codigo ms-2">@c.Codigo</span></h2>
+                    <h2 class="card-clinica-titulo">
+                        @(esEnfermera ? "Detalle de Consulta" : "Atención de Consulta")
+                        <span class="badge-codigo ms-2">@c.Codigo</span>
+                    </h2>
                     <div class="card-clinica-subtitulo">Información de la consulta y signos vitales del paciente</div>
                 </div>
                 <div class="d-flex gap-2">
@@ -80,7 +109,10 @@
 
             <div class="d-flex justify-content-end gap-2 pt-3 border-top">
                 <a asp-action="Index" class="btn btn-outline-secondary">Volver al listado</a>
-                <a asp-action="Edit" asp-route-id="@c.ConsultaId" class="btn btn-primary shadow-sm">Editar Consulta</a>
+                @if (!esEnfermera)
+                {
+                    <a asp-action="Edit" asp-route-id="@c.ConsultaId" class="btn btn-primary shadow-sm">Editar Consulta</a>
+                }
             </div>
         </div>
 
@@ -104,8 +136,11 @@
                         <tr>
                             <th style="width: 15%;">Código</th>
                             <th style="width: 25%;">Enfermedad</th>
-                            <th style="width: 45%;">Diagnóstico / Observaciones</th>
-                            <th style="width: 15%;" class="text-end">Acciones</th>
+                            <th style="@(esEnfermera ? "width: 60%;" : "width: 45%;")">Diagnóstico / Observaciones</th>
+                            @if (!esEnfermera)
+                            {
+                                <th style="width: 15%;" class="text-end">Acciones</th>
+                            }
                         </tr>
                     </thead>
                     <tbody>
@@ -120,20 +155,25 @@
                                         <div class="text-muted small">@item.TipoEnfermedad</div>
                                     </td>
                                     <td style="white-space: pre-line;">@(string.IsNullOrEmpty(item.Observaciones) ? "—" : item.Observaciones)</td>
-                                    <td class="text-end">
-                                        <form asp-action="QuitarEnfermedad" asp-route-id="@item.ConsultaEnfermedadId" method="post" class="d-inline"
-                                              onsubmit="return confirm('¿Desea quitar esta enfermedad de la consulta?');">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">Quitar</button>
-                                        </form>
-                                    </td>
+                                    @if (!esEnfermera)
+                                    {
+                                        <td class="text-end">
+                                            <form asp-action="QuitarEnfermedad" asp-route-id="@item.ConsultaEnfermedadId" method="post" class="d-inline"
+                                                  onsubmit="return confirm('¿Desea quitar esta enfermedad de la consulta?');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Quitar</button>
+                                            </form>
+                                        </td>
+                                    }
                                 </tr>
                             }
                         }
                         else
                         {
                             <tr>
-                                <td colspan="4" class="text-center text-muted py-4">
-                                    <p class="mb-0">Aún no se han asignado padecimientos a esta consulta.</p>
+                                <td colspan="@(esEnfermera ? 3 : 4)" class="text-center text-muted py-4">
+                                    <p class="mb-0">
+                                        @(esEnfermera ? "Aún no se han asignado diagnósticos médicos a esta consulta." : "Aún no se han asignado padecimientos a esta consulta.")
+                                    </p>
                                 </td>
                             </tr>
                         }
@@ -141,36 +181,48 @@
                 </table>
             </div>
 
-            <h6 class="text-muted fw-bold mb-3">Asignar padecimiento</h6>
-            @if (enfermedadesDisponibles.Any())
+            @if (!esEnfermera)
             {
-                <form asp-action="AsignarEnfermedad" method="post" class="bg-light p-3 rounded border">
-                    <input type="hidden" name="consultaId" value="@c.ConsultaId" />
+                <h6 class="text-muted fw-bold mb-3">Asignar padecimiento</h6>
+                @if (enfermedadesDisponibles.Any())
+                {
+                    <form asp-action="AsignarEnfermedad" method="post" class="bg-light p-3 rounded border">
+                        <input type="hidden" name="consultaId" value="@c.ConsultaId" />
 
-                    <div class="mb-3">
-                        <label for="enfermedadId" class="form-label">Enfermedad</label>
-                        <select id="enfermedadId" name="enfermedadId" asp-items="enfermedadesDisponibles" class="form-select" required>
-                            <option value="">-- Seleccione una enfermedad --</option>
-                        </select>
-                    </div>
+                        <div class="mb-3">
+                            <label for="enfermedadId" class="form-label">Enfermedad</label>
+                            <select id="enfermedadId" name="enfermedadId" asp-items="enfermedadesDisponibles" class="form-select" required>
+                                <option value="">-- Seleccione una enfermedad --</option>
+                            </select>
+                        </div>
 
-                    <div class="mb-3">
-                        <label for="observaciones" class="form-label">Diagnóstico / Observaciones</label>
-                        <textarea id="observaciones" name="observaciones" class="form-control" rows="3"
-                                  placeholder="Describa el diagnóstico, hallazgos y recomendaciones"></textarea>
-                    </div>
+                        <div class="mb-3">
+                            <label for="observaciones" class="form-label">Diagnóstico / Observaciones</label>
+                            <textarea id="observaciones" name="observaciones" class="form-control" rows="3"
+                                      placeholder="Describa el diagnóstico, hallazgos y recomendaciones"></textarea>
+                        </div>
 
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-primary shadow-sm">+ Asignar</button>
-                    </div>
-                </form>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary shadow-sm">+ Asignar</button>
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">
+                        No hay más enfermedades disponibles en el catálogo.
+                        <a asp-controller="Enfermedades" asp-action="Create">Registrar una nueva enfermedad</a>.
+                    </p>
+                }
             }
             else
             {
-                <p class="text-muted mb-0">
-                    No hay más enfermedades disponibles en el catálogo.
-                    <a asp-controller="Enfermedades" asp-action="Create">Registrar una nueva enfermedad</a>.
-                </p>
+                <div class="alert alert-light border py-2 text-muted small d-flex align-items-center mb-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2 flex-shrink-0" viewBox="0 0 16 16">
+                        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+                    </svg>
+                    <span>El diagnóstico y asignación de padecimientos es una función exclusiva del médico tratante.</span>
+                </div>
             }
         </div>
 
@@ -200,9 +252,12 @@
                         <tr>
                             <th style="width: 5%;">#</th>
                             <th style="width: 30%;">Medicamento</th>
-                            <th style="width: 35%;">Prescripción</th>
-                            <th style="width: 15%;">Cantidad</th>
-                            <th style="width: 15%;" class="text-end">Acciones</th>
+                            <th style="@(esEnfermera ? "width: 45%;" : "width: 35%;")">Prescripción</th>
+                            <th style="@(esEnfermera ? "width: 20%;" : "width: 15%;")">Cantidad</th>
+                            @if (!esEnfermera)
+                            {
+                                <th style="width: 15%;" class="text-end">Acciones</th>
+                            }
                         </tr>
                     </thead>
                     <tbody>
@@ -218,20 +273,25 @@
                                     </td>
                                     <td>@med.Prescripcion</td>
                                     <td>@med.Cantidad</td>
-                                    <td class="text-end">
-                                        <form asp-action="QuitarMedicamento" asp-route-id="@med.RecetaDetalleId" method="post" class="d-inline"
-                                              onsubmit="return confirm('¿Desea quitar este medicamento de la receta?');">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">Quitar</button>
-                                        </form>
-                                    </td>
+                                    @if (!esEnfermera)
+                                    {
+                                        <td class="text-end">
+                                            <form asp-action="QuitarMedicamento" asp-route-id="@med.RecetaDetalleId" method="post" class="d-inline"
+                                                  onsubmit="return confirm('¿Desea quitar este medicamento de la receta?');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Quitar</button>
+                                            </form>
+                                        </td>
+                                    }
                                 </tr>
                             }
                         }
                         else
                         {
                             <tr>
-                                <td colspan="5" class="text-center text-muted py-4">
-                                    <p class="mb-0">Aún no se han recetado medicamentos en esta consulta.</p>
+                                <td colspan="@(esEnfermera ? 4 : 5)" class="text-center text-muted py-4">
+                                    <p class="mb-0">
+                                        @(esEnfermera ? "Aún no se han recetado medicamentos en esta consulta." : "Aún no se han recetado medicamentos en esta consulta.")
+                                    </p>
                                 </td>
                             </tr>
                         }
@@ -239,42 +299,54 @@
                 </table>
             </div>
 
-            <h6 class="text-muted fw-bold mb-3">Recetar medicamento</h6>
-            @if (medicamentosDisponibles.Any())
+            @if (!esEnfermera)
             {
-                <form asp-action="AgregarMedicamento" method="post" class="bg-light p-3 rounded border">
-                    <input type="hidden" name="consultaId" value="@c.ConsultaId" />
+                <h6 class="text-muted fw-bold mb-3">Recetar medicamento</h6>
+                @if (medicamentosDisponibles.Any())
+                {
+                    <form asp-action="AgregarMedicamento" method="post" class="bg-light p-3 rounded border">
+                        <input type="hidden" name="consultaId" value="@c.ConsultaId" />
 
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label for="medicamentoId" class="form-label">Medicamento</label>
-                            <select id="medicamentoId" name="medicamentoId" asp-items="medicamentosDisponibles" class="form-select" required>
-                                <option value="">-- Seleccione un medicamento --</option>
-                            </select>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="medicamentoId" class="form-label">Medicamento</label>
+                                <select id="medicamentoId" name="medicamentoId" asp-items="medicamentosDisponibles" class="form-select" required>
+                                    <option value="">-- Seleccione un medicamento --</option>
+                                </select>
+                            </div>
+                            <div class="col-md-5 mb-3">
+                                <label for="prescripcion" class="form-label">Prescripción</label>
+                                <input id="prescripcion" name="prescripcion" class="form-control" maxlength="200" required
+                                       placeholder="Ej. 1 tableta cada 8 horas por 5 días" />
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="cantidad" class="form-label">Cantidad</label>
+                                <input id="cantidad" name="cantidad" class="form-control" maxlength="100" required
+                                       placeholder="Ej. 15 tabletas" />
+                            </div>
                         </div>
-                        <div class="col-md-5 mb-3">
-                            <label for="prescripcion" class="form-label">Prescripción</label>
-                            <input id="prescripcion" name="prescripcion" class="form-control" maxlength="200" required
-                                   placeholder="Ej. 1 tableta cada 8 horas por 5 días" />
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="cantidad" class="form-label">Cantidad</label>
-                            <input id="cantidad" name="cantidad" class="form-control" maxlength="100" required
-                                   placeholder="Ej. 15 tabletas" />
-                        </div>
-                    </div>
 
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-primary shadow-sm">+ Recetar</button>
-                    </div>
-                </form>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary shadow-sm">+ Recetar</button>
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">
+                        No hay más medicamentos disponibles en el catálogo.
+                        <a asp-controller="Medicamentos" asp-action="Create">Registrar un nuevo medicamento</a>.
+                    </p>
+                }
             }
             else
             {
-                <p class="text-muted mb-0">
-                    No hay más medicamentos disponibles en el catálogo.
-                    <a asp-controller="Medicamentos" asp-action="Create">Registrar un nuevo medicamento</a>.
-                </p>
+                <div class="alert alert-light border py-2 text-muted small d-flex align-items-center mb-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2 flex-shrink-0" viewBox="0 0 16 16">
+                        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+                    </svg>
+                    <span>La prescripción y adición de medicamentos está reservada exclusivamente para el médico tratante.</span>
+                </div>
             }
         </div>
 

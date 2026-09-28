@@ -1,9 +1,14 @@
+@using Microsoft.AspNetCore.Http
 @model IEnumerable<ClinicaMedEduardoMorenoMVCWeb.Models.Consultas>
 
 @{
     Layout = "_LayoutDoctor";
     ViewData["Title"] = "Consultas Médicas";
     ViewData["Seccion"] = "Consultas Médicas";
+    var rolSesion = Context.Session.GetString("UsuarioRol");
+    var esEnfermera = (!string.IsNullOrEmpty(rolSesion) && rolSesion.Equals("Enfermera", StringComparison.OrdinalIgnoreCase))
+                      || User.IsInRole("Enfermera")
+                      || (ViewBag.EsEnfermera is bool b && b);
     var pacientes = ViewBag.Pacientes as Dictionary<int, string> ?? new Dictionary<int, string>();
     string buscar = ViewBag.Buscar ?? "";
     string filtro = ViewBag.Filtro ?? "todas";
@@ -13,11 +18,34 @@
 }
 
 <div class="card-clinica">
+    @if (TempData["Mensaje"] is string msg)
+    {
+        <div class="alert alert-success alert-dismissible fade show py-2 mb-3" role="alert">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+            </svg>
+            @msg
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+    @if (TempData["Error"] is string err)
+    {
+        <div class="alert alert-danger alert-dismissible fade show py-2 mb-3" role="alert">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+            </svg>
+            @err
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+
     <form asp-action="Index" method="get" id="formFiltros">
         <div class="card-clinica-header">
             <div>
                 <h2 class="card-clinica-titulo">Consultas Médicas</h2>
-                <div class="card-clinica-subtitulo">Registro y atención de las consultas de los pacientes</div>
+                <div class="card-clinica-subtitulo">
+                    @(esEnfermera ? "Registro de pre-clínica, toma de signos vitales y consulta de historial" : "Registro y atención de las consultas de los pacientes")
+                </div>
             </div>
             <div class="d-flex gap-2 align-items-center">
                 <select name="filtro" class="form-select" style="min-width: 190px;" onchange="this.form.submit()">
@@ -56,10 +84,10 @@
                 <tr>
                     <th style="width: 12%;">@Html.DisplayNameFor(model => model.Codigo)</th>
                     <th style="width: 12%;">@Html.DisplayNameFor(model => model.Fecha)</th>
-                    <th style="width: 20%;">Paciente</th>
+                    <th style="width: 22%;">Paciente</th>
                     <th style="width: 22%;">Motivo</th>
-                    <th style="width: 10%;">@Html.DisplayNameFor(model => model.Estado)</th>
-                    <th style="width: 24%;" class="text-end">Acciones</th>
+                    <th style="width: 12%;">@Html.DisplayNameFor(model => model.Estado)</th>
+                    <th style="width: 20%;" class="text-end">Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -98,23 +126,42 @@
                                 <partial name="_EstadoBadge" model="item.Estado" />
                             </td>
                             <td class="text-end">
-                                @if (item.Estado == "atendida")
+                                @if (esEnfermera)
                                 {
-                                    <a asp-action="Edit" asp-route-id="@item.ConsultaId" class="btn btn-sm btn-outline-primary me-1">Editar</a>
-                                    <a asp-action="Imprimir" asp-route-id="@item.ConsultaId" target="_blank" class="btn btn-sm btn-outline-secondary me-1" title="Imprimir consulta">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
-                                            <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1" />
-                                            <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1" />
-                                        </svg>
-                                        <span class="visually-hidden">Imprimir</span>
-                                    </a>
+                                    <!-- Vista restringida para Enfermera: Solo ver detalle e icono de imprimir sin función aún -->
+                                    <a asp-action="Details" asp-route-id="@item.ConsultaId" class="btn btn-sm btn-outline-secondary me-1">Ver</a>
+                                    @if (item.Estado == "atendida")
+                                    {
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" title="Imprimir (Próximamente)" disabled>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                                                <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1" />
+                                                <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1" />
+                                            </svg>
+                                            <span class="visually-hidden">Imprimir</span>
+                                        </button>
+                                    }
                                 }
                                 else
                                 {
-                                    <a asp-action="Details" asp-route-id="@item.ConsultaId" class="btn btn-sm btn-outline-secondary me-1">Atender</a>
-                                    <a asp-action="Edit" asp-route-id="@item.ConsultaId" class="btn btn-sm btn-outline-primary me-1">Editar</a>
+                                    <!-- Vista completa para Doctor -->
+                                    @if (item.Estado == "atendida")
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@item.ConsultaId" class="btn btn-sm btn-outline-primary me-1">Editar</a>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary me-1" title="Imprimir (Próximamente)" disabled>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                                                <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1" />
+                                                <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1" />
+                                            </svg>
+                                            <span class="visually-hidden">Imprimir</span>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="Details" asp-route-id="@item.ConsultaId" class="btn btn-sm btn-outline-secondary me-1">Atender</a>
+                                        <a asp-action="Edit" asp-route-id="@item.ConsultaId" class="btn btn-sm btn-outline-primary me-1">Editar</a>
+                                    }
+                                    <a asp-action="Delete" asp-route-id="@item.ConsultaId" class="btn btn-sm btn-outline-danger">Eliminar</a>
                                 }
-                                <a asp-action="Delete" asp-route-id="@item.ConsultaId" class="btn btn-sm btn-outline-danger">Eliminar</a>
                             </td>
                         </tr>
                         @if (previas != null && previas.Any())

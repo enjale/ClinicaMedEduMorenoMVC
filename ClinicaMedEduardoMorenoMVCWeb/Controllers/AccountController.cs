@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Security.Claims;
 using ClinicaMedEduardoMorenoMVCWeb.Data;
 using ClinicaMedEduardoMorenoMVCWeb.Models.ViewModels;
 using ClinicaMedEduardoMorenoMVCWeb.Services;
@@ -60,6 +63,23 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
                 return View(model);
             }
 
+            // Guardar datos en sesión para fácil acceso en controladores y vistas
+            HttpContext.Session.SetInt32("UsuarioId", usuario.UsuarioId);
+            HttpContext.Session.SetString("UsuarioNombre", usuario.Nombre);
+            HttpContext.Session.SetString("UsuarioRol", usuario.Rol ?? "");
+            HttpContext.Session.SetString("NombreUsuario", usuario.NombreUsuario);
+
+            // Autenticación con Cookies y Claims
+            var claims = new List<System.Security.Claims.Claim>
+            {
+                new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.NameIdentifier, usuario.UsuarioId.ToString()),
+                new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Name, usuario.Nombre),
+                new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Role, usuario.Rol ?? "Doctor"),
+                new System.Security.Claims.Claim("UsuarioId", usuario.UsuarioId.ToString())
+            };
+            var claimsIdentity = new System.Security.Claims.ClaimsIdentity(claims, Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme, new System.Security.Claims.ClaimsPrincipal(claimsIdentity));
+
             // Redirección según rol: si es Enfermera a su panel, si es Doctor/otro a DoctorDashboard
             if (usuario.Rol != null && usuario.Rol.Equals("Enfermera", StringComparison.OrdinalIgnoreCase))
             {
@@ -67,6 +87,14 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
             }
 
             return RedirectToAction("DoctorDashboard", "Home", new { doctorNombre = usuario.Nombre });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme);
+            HttpContext.Session.Clear();
+            return RedirectToAction(nameof(Login));
         }
 
         [HttpGet]

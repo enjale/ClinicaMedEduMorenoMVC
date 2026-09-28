@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using ClinicaMedEduardoMorenoMVCWeb.Models;
 using ClinicaMedEduardoMorenoMVCWeb.Models.ViewModels;
 using ClinicaMedEduardoMorenoMVCWeb.Data;
+using System.Security.Claims;
 
 namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
 {
@@ -17,6 +18,24 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
         public ConsultasController(AppDbContext context)
         {
             _context = context;
+        }
+
+        private bool EsEnfermera()
+        {
+            var rol = HttpContext.Session.GetString("UsuarioRol")
+                      ?? User.FindFirst(ClaimTypes.Role)?.Value;
+            return string.Equals(rol, "Enfermera", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private int? ObtenerUsuarioIdActual()
+        {
+            var id = HttpContext.Session.GetInt32("UsuarioId");
+            if (id.HasValue && id.Value > 0) return id.Value;
+
+            var claimId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(claimId, out int uId)) return uId;
+
+            return null;
         }
 
         public IActionResult Index(int pagina = 1, string? buscar = null, string? filtro = null)
@@ -102,6 +121,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
             ViewBag.TotalPaginas = totalPaginas;
             ViewBag.TotalRegistros = totalRegistros;
             ViewBag.TamañoPagina = tamañoPagina;
+            ViewBag.EsEnfermera = EsEnfermera();
 
             return View(consultas);
         }
@@ -125,7 +145,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
             return $"CON-{siguienteNumero:D3}";
         }
 
-        private void CargarListas()
+        private void CargarListas(Consultas? consulta = null)
         {
             ViewBag.Expedientes = (from e in _context.Expedientes
                                    join p in _context.Pacientes on e.PacienteId equals p.PacienteId
@@ -153,6 +173,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
                 .ToList();
 
             ViewBag.Estados = EstadosConsulta;
+            ViewBag.EsEnfermera = EsEnfermera();
         }
 
         private void ValidarConsulta(Consultas consulta)
@@ -175,13 +196,15 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
 
         public IActionResult Create()
         {
+            var usuarioActualId = ObtenerUsuarioIdActual();
             var consulta = new Consultas
             {
                 Codigo = GenerarSiguienteCodigo(),
                 Fecha = DateTime.Today,
-                Estado = "pendiente"
+                Estado = "pendiente",
+                UsuarioId = usuarioActualId ?? 0
             };
-            CargarListas();
+            CargarListas(consulta);
             return View(consulta);
         }
 
@@ -191,6 +214,21 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
             // Asignar el código automáticamente para garantizar consistencia y correlatividad
             consulta.Codigo = GenerarSiguienteCodigo();
             ModelState.Remove(nameof(consulta.Codigo));
+
+            // Si es enfermera, el estado siempre es "pendiente" y no puede crearla como atendida ni agregar medicamentos
+            if (EsEnfermera())
+            {
+                consulta.Estado = "pendiente";
+                ModelState.Remove(nameof(consulta.Estado));
+
+                var usuarioActualId = ObtenerUsuarioIdActual();
+                if ((consulta.UsuarioId == 0) && usuarioActualId.HasValue)
+                {
+                    consulta.UsuarioId = usuarioActualId.Value;
+                    ModelState.Remove(nameof(consulta.UsuarioId));
+                }
+            }
+
             ValidarConsulta(consulta);
 
             if (ModelState.IsValid)
@@ -199,11 +237,17 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
                 _context.Consultas.Add(consulta);
                 _context.SaveChanges();
 
-                // Después de registrar, se abre la atención para asignar diagnósticos
+                if (EsEnfermera())
+                {
+                    TempData["Mensaje"] = "Consulta registrada correctamente. Queda pendiente para la atención del médico.";
+                    return RedirectToAction(nameof(Details), new { id = consulta.ConsultaId });
+                }
+
+                // Después de registrar por doctor, se abre la atención para asignar diagnósticos y recetas
                 return RedirectToAction(nameof(Details), new { id = consulta.ConsultaId });
             }
 
-            CargarListas();
+            CargarListas(consulta);
             return View(consulta);
         }
 
@@ -215,6 +259,8 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
             {
                 return NotFound();
             }
+
+            ViewBag.EsEnfermera = EsEnfermera();
 
             // Solo se ofrecen las enfermedades que aún no están asignadas a la consulta
             var asignadas = _context.ConsultaEnfermedades
@@ -335,6 +381,12 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
         [HttpPost]
         public IActionResult AgregarMedicamento(int consultaId, int medicamentoId, string? prescripcion, string? cantidad)
         {
+            if (EsEnfermera())
+            {
+                TempData["ErrorReceta"] = "Acceso restringido: Las enfermeras no pueden agregar ni recetar medicamentos.";
+                return Redirect(Url.Action(nameof(Details), new { id = consultaId }) + "#receta");
+            }
+
             var consulta = _context.Consultas.Find(consultaId);
             if (consulta == null)
             {
@@ -413,6 +465,12 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
         [HttpPost]
         public IActionResult QuitarMedicamento(int id)
         {
+            if (EsEnfermera())
+            {
+                TempData["Error"] = "Acceso restringido: Las enfermeras no pueden modificar recetas médicas.";
+                return RedirectToAction(nameof(Index));
+            }
+
             var detalle = _context.RecetaDetalles.Find(id);
             if (detalle == null)
             {
@@ -506,6 +564,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
                 }).ToList()
             };
 
+            ViewBag.EsEnfermera = EsEnfermera();
             return View(modelo);
         }
 
@@ -518,11 +577,18 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
                 return NotFound();
             }
 
+            ViewBag.EsEnfermera = EsEnfermera();
             return View(modelo);
         }
 
         public IActionResult Edit(int id)
         {
+            if (EsEnfermera())
+            {
+                TempData["Error"] = "Acceso denegado: Las enfermeras no tienen permisos para editar consultas.";
+                return RedirectToAction(nameof(Index));
+            }
+
             var consulta = _context.Consultas.Find(id);
 
             if (consulta == null)
@@ -530,13 +596,19 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
                 return NotFound();
             }
 
-            CargarListas();
+            CargarListas(consulta);
             return View(consulta);
         }
 
         [HttpPost]
         public IActionResult Edit(int id, Consultas consulta)
         {
+            if (EsEnfermera())
+            {
+                TempData["Error"] = "Acceso denegado: Las enfermeras no tienen permisos para editar consultas.";
+                return RedirectToAction(nameof(Index));
+            }
+
             if (id != consulta.ConsultaId)
             {
                 return NotFound();
@@ -562,13 +634,19 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
                 return RedirectToAction(nameof(Details), new { id = consulta.ConsultaId });
             }
 
-            CargarListas();
+            CargarListas(consulta);
             return View(consulta);
         }
 
         [HttpPost]
         public IActionResult AsignarEnfermedad(int consultaId, int enfermedadId, string? observaciones)
         {
+            if (EsEnfermera())
+            {
+                TempData["ErrorEnfermedad"] = "Acceso restringido: Solo los médicos pueden asignar diagnósticos.";
+                return RedirectToAction(nameof(Details), new { id = consultaId });
+            }
+
             if (!_context.Consultas.Any(c => c.ConsultaId == consultaId))
             {
                 return NotFound();
@@ -600,6 +678,12 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
         [HttpPost]
         public IActionResult QuitarEnfermedad(int id)
         {
+            if (EsEnfermera())
+            {
+                TempData["Error"] = "Acceso restringido: Las enfermeras no pueden modificar diagnósticos.";
+                return RedirectToAction(nameof(Index));
+            }
+
             var registro = _context.ConsultaEnfermedades.Find(id);
 
             if (registro == null)
@@ -615,6 +699,12 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
 
         public IActionResult Delete(int id)
         {
+            if (EsEnfermera())
+            {
+                TempData["Error"] = "Acceso denegado: Las enfermeras no tienen permisos para eliminar consultas.";
+                return RedirectToAction(nameof(Index));
+            }
+
             var modelo = ObtenerDetalle(id);
 
             if (modelo == null)
@@ -629,6 +719,12 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
         [HttpPost, ActionName("Delete")]
         public IActionResult DeleteConfirmed(int id)
         {
+            if (EsEnfermera())
+            {
+                TempData["Error"] = "Acceso denegado: Las enfermeras no tienen permisos para eliminar consultas.";
+                return RedirectToAction(nameof(Index));
+            }
+
             var consulta = _context.Consultas.Find(id);
 
             if (consulta != null)

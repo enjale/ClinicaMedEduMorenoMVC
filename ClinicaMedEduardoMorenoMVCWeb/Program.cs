@@ -18,6 +18,22 @@ builder.Services.Configure<ClinicaMedEduardoMorenoMVCWeb.Models.EmailSettings>(
 builder.Services.AddScoped<ClinicaMedEduardoMorenoMVCWeb.Services.IEmailService, ClinicaMedEduardoMorenoMVCWeb.Services.EmailService>();
 builder.Services.AddDataProtection();
 
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(8);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/Login";
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+    });
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -38,7 +54,9 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseSession();
 
 app.MapStaticAssets();
 

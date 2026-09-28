@@ -1,3 +1,14 @@
+@using Microsoft.AspNetCore.Http
+@{
+    var rolSesion = Context.Session.GetString("UsuarioRol");
+    var esEnfermera = (!string.IsNullOrEmpty(rolSesion) && rolSesion.Equals("Enfermera", StringComparison.OrdinalIgnoreCase))
+                      || User.IsInRole("Enfermera")
+                      || (ViewBag.EsEnfermera is bool b && b);
+    var nombreUsuario = Context.Session.GetString("UsuarioNombre")
+                        ?? User.Identity?.Name
+                        ?? (esEnfermera ? "Enfermera" : "Dr. Eduardo Moreno");
+    var rolTexto = esEnfermera ? "Enfermera" : "Doctor";
+}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -14,35 +25,40 @@
     <aside class="sidebar-clinica d-flex flex-column">
 
         <!--Logo Clinica-->
-        <div class="sidebar-header">
-            <small>CLINICA MEDICA</small>
-            <h3>Eduardo Moreno</h3>
-        </div>
+        <a asp-controller="Home" asp-action="@(esEnfermera ? "EnfermeraDashboard" : "DoctorDashboard")" class="text-decoration-none text-white">
+            <div class="sidebar-header">
+                <small>CLINICA MEDICA</small>
+                <h3>Eduardo Moreno</h3>
+            </div>
+        </a>
 
         <!--Menu Barras Laterales-->
         <nav class="sidebar-menu flex-grow-1">
             <a asp-controller="Expedientes" asp-action="Index">Expedientes Clinicos</a>
             <a asp-controller="Consultas" asp-action="Index">Consultas Medicas</a>
 
-            <div class="sidebar-section">CATALOGOS</div>
-            <a asp-controller="Medicamentos" asp-action="Index">Medicamentos</a>
-            <a asp-controller="Alergias" asp-action="Index">Alergias</a>
-            <a asp-controller="Enfermedades" asp-action="Index">Enfermedades</a>
+            @if (!esEnfermera)
+            {
+                <div class="sidebar-section">CATALOGOS</div>
+                <a asp-controller="Medicamentos" asp-action="Index">Medicamentos</a>
+                <a asp-controller="Alergias" asp-action="Index">Alergias</a>
+                <a asp-controller="Enfermedades" asp-action="Index">Enfermedades</a>
+            }
         </nav>
 
         <!--Cierre De Sesion-->
         <div class="sidebar-footer">
-            <a asp-controller="Account" asp-action="Login">Cerrar Sesion</a>
+            <a asp-controller="Account" asp-action="Logout">Cerrar Sesion</a>
         </div>
     </aside>
 
     <!--Contenido de derecha-->
     <main class="contenido-principal flex-grow-1">
 
-        <!--Barra Superior Verde con Datos Del Doctor-->
+        <!--Barra Superior Verde con Datos Del Usuario Activo-->
         <header class="header-doctor text-end">
             <span class="fw-bold d-block">@(ViewData["Seccion"] ?? ViewData["Title"] ?? "Panel Principal")</span>
-            <span class="d-block small">Dr. Eduardo Moreno · Doctor</span>
+            <span class="d-block small">@nombreUsuario · @rolTexto</span>
         </header>
 
         <!-- Contenido de la vista -->

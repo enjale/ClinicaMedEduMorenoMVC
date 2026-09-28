@@ -1,6 +1,11 @@
+@using Microsoft.AspNetCore.Http
 @model ClinicaMedEduardoMorenoMVCWeb.Models.Consultas
 
 @{
+    var rolSesion = Context.Session.GetString("UsuarioRol");
+    var esEnfermera = (!string.IsNullOrEmpty(rolSesion) && rolSesion.Equals("Enfermera", StringComparison.OrdinalIgnoreCase))
+                      || User.IsInRole("Enfermera")
+                      || (ViewBag.EsEnfermera is bool b && b);
     var medicos = (ViewBag.Medicos as List<string>) ?? new List<string>();
     // Si la consulta tiene un médico que ya no está en la lista (p. ej. inactivo), se conserva
     if (!string.IsNullOrEmpty(Model.Medico) && !medicos.Contains(Model.Medico))
@@ -13,7 +18,7 @@
 <div class="row">
     <div class="col-md-6 mb-3">
         <label asp-for="ExpedienteId" class="form-label"></label>
-        <select asp-for="ExpedienteId" asp-items="ViewBag.Expedientes" class="form-select">
+        <select asp-for="ExpedienteId" asp-items="ViewBag.Expedientes" class="form-select" required>
             <option value="">-- Seleccione un paciente --</option>
         </select>
         <span asp-validation-for="ExpedienteId" class="text-danger small"></span>
@@ -21,14 +26,14 @@
 
     <div class="col-md-6 mb-3">
         <label asp-for="Fecha" class="form-label"></label>
-        <input asp-for="Fecha" type="date" class="form-control" />
+        <input asp-for="Fecha" type="date" class="form-control" required />
         <span asp-validation-for="Fecha" class="text-danger small"></span>
     </div>
 </div>
 
 <div class="mb-3">
     <label asp-for="Motivo" class="form-label"></label>
-    <textarea asp-for="Motivo" class="form-control" rows="3" placeholder="Describa el motivo por el que el paciente asiste a consulta"></textarea>
+    <textarea asp-for="Motivo" class="form-control" rows="3" placeholder="Describa el motivo por el que el paciente asiste a consulta" required></textarea>
     <span asp-validation-for="Motivo" class="text-danger small"></span>
 </div>
 
@@ -51,7 +56,7 @@
     </div>
 </div>
 
-<h6 class="text-muted fw-bold mt-4 mb-3">Atención</h6>
+<h6 class="text-muted fw-bold mt-4 mb-3">Atención y Asignación</h6>
 <div class="row">
     <div class="col-md-4 mb-3">
         <label asp-for="Medico" class="form-label"></label>
@@ -62,19 +67,32 @@
     </div>
     <div class="col-md-4 mb-3">
         <label asp-for="UsuarioId" class="form-label"></label>
-        <select asp-for="UsuarioId" asp-items="ViewBag.Usuarios" class="form-select">
+        <select asp-for="UsuarioId" asp-items="ViewBag.Usuarios" class="form-select" required>
             <option value="">-- Seleccione --</option>
         </select>
         <span asp-validation-for="UsuarioId" class="text-danger small"></span>
     </div>
     <div class="col-md-4 mb-4">
         <label asp-for="Estado" class="form-label"></label>
-        <select asp-for="Estado" class="form-select">
-            @foreach (var estado in estados)
-            {
-                <option value="@estado">@(char.ToUpper(estado[0]) + estado.Substring(1))</option>
-            }
-        </select>
-        <span asp-validation-for="Estado" class="text-danger small"></span>
+        @if (esEnfermera)
+        {
+            <!-- La enfermera registra consultas en estado pendiente (en espera del doctor) -->
+            <input type="hidden" asp-for="Estado" value="pendiente" />
+            <div class="form-control bg-light d-flex align-items-center justify-content-between" style="cursor: not-allowed;">
+                <span class="fw-semibold text-warning-emphasis">Pendiente</span>
+                <span class="badge bg-warning text-dark">En espera de atención médica</span>
+            </div>
+            <small class="text-muted d-block mt-1">El estado pasará a atendido cuando el médico realice la consulta.</small>
+        }
+        else
+        {
+            <select asp-for="Estado" class="form-select">
+                @foreach (var estado in estados)
+                {
+                    <option value="@estado">@(char.ToUpper(estado[0]) + estado.Substring(1))</option>
+                }
+            </select>
+            <span asp-validation-for="Estado" class="text-danger small"></span>
+        }
     </div>
 </div>

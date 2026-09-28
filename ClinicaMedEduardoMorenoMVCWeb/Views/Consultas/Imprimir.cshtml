@@ -101,31 +101,6 @@
             <p class="text-muted">Sin diagnósticos registrados.</p>
         }
 
-        @if (Model.Medicamentos.Any())
-        {
-            <h6>Receta médica @(Model.Receta != null ? $"({Model.Receta.Codigo})" : "")</h6>
-            <table class="table table-sm table-bordered mb-0">
-                <thead>
-                    <tr>
-                        <th style="width: 5%;">#</th>
-                        <th style="width: 35%;">Medicamento</th>
-                        <th style="width: 40%;">Prescripción</th>
-                        <th style="width: 20%;">Cantidad</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var med in Model.Medicamentos)
-                    {
-                        <tr>
-                            <td>@med.Orden</td>
-                            <td class="fw-semibold">@med.NombreMedicamento</td>
-                            <td>@med.Prescripcion</td>
-                            <td>@med.Cantidad</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
 
         <div class="d-flex justify-content-end">
             <div class="firma">

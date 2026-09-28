@@ -19,6 +19,20 @@
         </div>
     </div>
 
+    <form asp-action="Index" method="get" class="row g-2 align-items-end mb-4">
+        <div class="col-md-5">
+            <label for="buscar" class="form-label">Buscar</label>
+            <input type="text" id="buscar" name="buscar" value="@ViewBag.Buscar" class="form-control"
+                   placeholder="Buscar por código o nombre..." />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </div>
+        <div class="col-auto">
+            <a asp-action="Index" class="btn btn-outline-secondary">Limpiar</a>
+        </div>
+    </form>
+
     <div class="table-responsive">
         <table class="table align-middle mb-0">
             <thead>
@@ -41,7 +55,6 @@
                                 @Html.DisplayFor(modelItem => item.Nombre)
                             </td>
                             <td class="text-end">
-                                <a asp-action="Details" asp-route-id="@item.AlergiaId" class="btn btn-sm btn-outline-secondary me-1">Detalles</a>
                                 <a asp-action="Edit" asp-route-id="@item.AlergiaId" class="btn btn-sm btn-outline-primary me-1">Editar</a>
                                 <a asp-action="Delete" asp-route-id="@item.AlergiaId" class="btn btn-sm btn-outline-danger">Eliminar</a>
                             </td>
@@ -52,7 +65,7 @@
                 {
                     <tr>
                         <td colspan="3" class="text-center text-muted py-5">
-                            <p class="mb-0">No se encontraron alergias registradas en esta página.</p>
+                            <p class="mb-0">@(string.IsNullOrEmpty(ViewBag.Buscar as string) ? "No se encontraron alergias registradas en esta página." : "No se encontraron resultados para la búsqueda.")</p>
                         </td>
                     </tr>
                 }
@@ -76,24 +89,24 @@
             <nav aria-label="Navegación de páginas">
                 <ul class="pagination pagination-clinica pagination-sm mb-0">
                     <li class="page-item @(paginaActual <= 1 ? "disabled" : "")">
-                        <a class="page-link" asp-action="Index" asp-route-pagina="1" title="Primera página">«</a>
+                        <a class="page-link" asp-action="Index" asp-route-buscar="@ViewBag.Buscar" asp-route-pagina="1" title="Primera página">«</a>
                     </li>
                     <li class="page-item @(paginaActual <= 1 ? "disabled" : "")">
-                        <a class="page-link" asp-action="Index" asp-route-pagina="@(paginaActual - 1)" title="Página anterior">Anterior</a>
+                        <a class="page-link" asp-action="Index" asp-route-buscar="@ViewBag.Buscar" asp-route-pagina="@(paginaActual - 1)" title="Página anterior">Anterior</a>
                     </li>
 
                     @for (int i = Math.Max(1, paginaActual - 2); i <= Math.Min(totalPaginas, paginaActual + 2); i++)
                     {
                         <li class="page-item @(i == paginaActual ? "active" : "")">
-                            <a class="page-link" asp-action="Index" asp-route-pagina="@i">@i</a>
+                            <a class="page-link" asp-action="Index" asp-route-buscar="@ViewBag.Buscar" asp-route-pagina="@i">@i</a>
                         </li>
                     }
 
                     <li class="page-item @(paginaActual >= totalPaginas ? "disabled" : "")">
-                        <a class="page-link" asp-action="Index" asp-route-pagina="@(paginaActual + 1)" title="Página siguiente">Siguiente</a>
+                        <a class="page-link" asp-action="Index" asp-route-buscar="@ViewBag.Buscar" asp-route-pagina="@(paginaActual + 1)" title="Página siguiente">Siguiente</a>
                     </li>
                     <li class="page-item @(paginaActual >= totalPaginas ? "disabled" : "")">
-                        <a class="page-link" asp-action="Index" asp-route-pagina="@totalPaginas" title="Última página">»</a>
+                        <a class="page-link" asp-action="Index" asp-route-buscar="@ViewBag.Buscar" asp-route-pagina="@totalPaginas" title="Última página">»</a>
                     </li>
                 </ul>
             </nav>

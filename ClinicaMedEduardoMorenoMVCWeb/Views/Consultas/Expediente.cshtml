@@ -1,0 +1,206 @@
+@model ClinicaMedEduardoMorenoMVCWeb.Models.ViewModels.ExpedienteCompletoViewModel
+
+@{
+    Layout = "_LayoutDoctor";
+    ViewData["Title"] = "Expediente Clínico";
+    ViewData["Seccion"] = "Consultas Médicas";
+    var p = Model.Paciente;
+    var sexo = p.Sexo switch { "M" => "Masculino", "F" => "Femenino", _ => p.Sexo };
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+
+        <!-- Datos del paciente -->
+        <div class="card-clinica mb-4">
+            <div class="card-clinica-header">
+                <div>
+                    <h2 class="card-clinica-titulo">Expediente Clínico <span class="badge-codigo ms-2">@Model.CodigoExpediente</span></h2>
+                    <div class="card-clinica-subtitulo">Creado el @Model.FechaCreacion.ToString("dd/MM/yyyy")</div>
+                </div>
+                @if (Model.ConsultaOrigenId.HasValue)
+                {
+                    <a asp-action="Details" asp-route-id="@Model.ConsultaOrigenId" class="btn btn-sm btn-outline-secondary">← Volver a la consulta</a>
+                }
+                else
+                {
+                    <a asp-action="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
+                }
+            </div>
+
+            <div class="bg-light p-3 rounded border">
+                <div class="row mb-3">
+                    <div class="col-sm-3 text-muted fw-bold">Paciente:</div>
+                    <div class="col-sm-9 fw-semibold">@p.Nombre <span class="text-muted small ms-2">@p.Codigo</span></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3 text-muted fw-bold">Edad:</div>
+                    <div class="col-sm-3">@(Model.Edad.HasValue ? $"{Model.Edad} años" : "—")</div>
+                    <div class="col-sm-3 text-muted fw-bold">Sexo:</div>
+                    <div class="col-sm-3">@(string.IsNullOrEmpty(sexo) ? "—" : sexo)</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3 text-muted fw-bold">DUI:</div>
+                    <div class="col-sm-3">@(string.IsNullOrEmpty(p.DUI) ? "—" : p.DUI)</div>
+                    <div class="col-sm-3 text-muted fw-bold">Teléfono:</div>
+                    <div class="col-sm-3">@(string.IsNullOrEmpty(p.Telefono) ? "—" : p.Telefono)</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3 text-muted fw-bold">Altura / Peso:</div>
+                    <div class="col-sm-9">
+                        @(p.Altura.HasValue ? $"{p.Altura:0.00} m" : "—") / @(p.Peso.HasValue ? $"{p.Peso:0.##} kg" : "—")
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3 text-muted fw-bold">Dirección:</div>
+                    <div class="col-sm-9">@(string.IsNullOrEmpty(p.Direccion) ? "—" : p.Direccion)</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3 text-muted fw-bold">Historial:</div>
+                    <div class="col-sm-9" style="white-space: pre-line;">@(string.IsNullOrEmpty(Model.Historial) ? "Sin historial registrado." : Model.Historial)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alergias, enfermedades crónicas y antecedentes -->
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card-clinica h-100">
+                    <h6 class="text-muted fw-bold mb-3">Alergias</h6>
+                    @if (Model.Alergias.Any())
+                    {
+                        <ul class="list-unstyled small mb-0">
+                            @foreach (var a in Model.Alergias)
+                            {
+                                var clase = a.Nivel switch { "Severa" => "bg-danger", "Moderada" => "bg-warning text-dark", _ => "bg-secondary" };
+                                <li class="py-2 border-bottom">
+                                    <span class="fw-semibold">@a.Alergia</span>
+                                    <span class="badge @clase ms-1">@a.Nivel</span>
+                                    @if (!string.IsNullOrEmpty(a.Observaciones))
+                                    {
+                                        <div class="text-muted">@a.Observaciones</div>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted small mb-0">Sin alergias registradas.</p>
+                    }
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card-clinica h-100">
+                    <h6 class="text-muted fw-bold mb-3">Enfermedades crónicas</h6>
+                    @if (Model.Enfermedades.Any())
+                    {
+                        <ul class="list-unstyled small mb-0">
+                            @foreach (var e in Model.Enfermedades)
+                            {
+                                <li class="py-2 border-bottom">
+                                    <span class="fw-semibold">@e.Enfermedad</span>
+                                    <span class="text-muted">(@e.TipoEnfermedad)</span>
+                                    @if (e.FechaDeteccion.HasValue)
+                                    {
+                                        <div class="text-muted">Detectada: @e.FechaDeteccion.Value.ToString("dd/MM/yyyy")</div>
+                                    }
+                                    @if (!string.IsNullOrEmpty(e.Observaciones))
+                                    {
+                                        <div class="text-muted">@e.Observaciones</div>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted small mb-0">Sin enfermedades registradas.</p>
+                    }
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card-clinica h-100">
+                    <h6 class="text-muted fw-bold mb-3">Antecedentes</h6>
+                    @if (Model.Antecedentes.Any())
+                    {
+                        <ul class="list-unstyled small mb-0">
+                            @foreach (var an in Model.Antecedentes)
+                            {
+                                <li class="py-2 border-bottom">
+                                    <span class="fw-semibold">@an.Tipo</span>
+                                    <span class="text-muted">· @an.Fecha.ToString("dd/MM/yyyy")</span>
+                                    <div>@an.Descripcion</div>
+                                    @if (!string.IsNullOrEmpty(an.Observaciones))
+                                    {
+                                        <div class="text-muted">@an.Observaciones</div>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted small mb-0">Sin antecedentes registrados.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Historial de consultas -->
+        <div class="card-clinica">
+            <div class="card-clinica-header">
+                <div>
+                    <h2 class="card-clinica-titulo">Historial de Consultas</h2>
+                    <div class="card-clinica-subtitulo">@Model.Consultas.Count consulta(s) registradas para este paciente</div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 12%;">Código</th>
+                            <th style="width: 11%;">Fecha</th>
+                            <th style="width: 20%;">Motivo</th>
+                            <th style="width: 22%;">Diagnóstico</th>
+                            <th style="width: 22%;">Medicamentos</th>
+                            <th style="width: 8%;">Estado</th>
+                            <th style="width: 5%;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Consultas.Any())
+                        {
+                            @foreach (var h in Model.Consultas)
+                            {
+                                <tr class="@(h.ConsultaId == Model.ConsultaOrigenId ? "table-active" : "")">
+                                    <td><span class="badge-codigo">@h.Codigo</span></td>
+                                    <td>@h.Fecha.ToString("dd/MM/yyyy")</td>
+                                    <td>@h.Motivo</td>
+                                    <td class="small">@(h.Diagnosticos.Any() ? string.Join(", ", h.Diagnosticos) : "—")</td>
+                                    <td class="small">@(h.Medicamentos.Any() ? string.Join(", ", h.Medicamentos) : "—")</td>
+                                    <td><partial name="_EstadoBadge" model="h.Estado" /></td>
+                                    <td class="text-end">
+                                        <a asp-action="Details" asp-route-id="@h.ConsultaId" class="btn btn-sm btn-outline-secondary">Ver</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">
+                                    <p class="mb-0">El paciente no tiene consultas registradas.</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>

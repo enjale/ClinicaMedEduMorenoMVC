@@ -2,9 +2,11 @@ using Microsoft.AspNetCore.Mvc;
 using ClinicaMedEduardoMorenoMVCWeb.Data;
 using ClinicaMedEduardoMorenoMVCWeb.Models;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClinicaMedEduardoMorenoMVCWeb.Models
 {
+    [Table("RecetaDetalle")]
     public class RecetaDetalle
     {
         [Key]

@@ -14,22 +14,32 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
             _context = context;
         }
 
-        public IActionResult Index(int pagina = 1)
+        public IActionResult Index(int pagina = 1, string? buscar = null)
         {
             if (pagina < 1) pagina = 1;
             int tamañoPagina = 10;
-            var totalRegistros = _context.Medicamentos.Count();
+
+            // Búsqueda por código o nombre
+            var query = _context.Medicamentos.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(buscar))
+            {
+                buscar = buscar.Trim();
+                query = query.Where(m => m.Codigo.Contains(buscar) || m.Nombre.Contains(buscar));
+            }
+
+            var totalRegistros = query.Count();
             var totalPaginas = (int)Math.Ceiling((double)totalRegistros / tamañoPagina);
             if (totalPaginas == 0) totalPaginas = 1;
 
             if (pagina > totalPaginas) pagina = totalPaginas;
 
-            var medicamentos = _context.Medicamentos
+            var medicamentos = query
                 .OrderBy(m => m.MedicamentoId)
                 .Skip((pagina - 1) * tamañoPagina)
                 .Take(tamañoPagina)
                 .ToList();
 
+            ViewBag.Buscar = buscar;
             ViewBag.PaginaActual = pagina;
             ViewBag.TotalPaginas = totalPaginas;
             ViewBag.TotalRegistros = totalRegistros;

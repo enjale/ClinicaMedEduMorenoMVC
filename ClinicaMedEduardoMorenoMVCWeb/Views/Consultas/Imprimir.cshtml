@@ -1,0 +1,142 @@
+@model ClinicaMedEduardoMorenoMVCWeb.Models.ViewModels.ConsultaDetalleViewModel
+
+@{
+    Layout = null;
+    var c = Model.Consulta;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Consulta @c.Codigo - Clínica Médica</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body { background: #f3f4f6; }
+        .hoja { max-width: 800px; margin: 2rem auto; background: #fff; padding: 2.5rem; border: 1px solid var(--color-borde); border-radius: 6px; }
+        .hoja-encabezado { border-bottom: 3px solid var(--color-principal); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+        .hoja h6 { color: var(--color-principal-oscuro); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; margin: 1.5rem 0 0.75rem; }
+        .firma { margin-top: 4rem; width: 260px; border-top: 1px solid #333; text-align: center; padding-top: 0.35rem; }
+
+        @@media print {
+            body { background: #fff; }
+            .no-imprimir { display: none !important; }
+            .hoja { margin: 0; border: none; padding: 0; max-width: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="no-imprimir text-center mt-3">
+        <button type="button" class="btn btn-primary" onclick="window.print()">Imprimir</button>
+        <button type="button" class="btn btn-outline-secondary" onclick="window.close()">Cerrar</button>
+    </div>
+
+    <div class="hoja">
+        <div class="hoja-encabezado d-flex justify-content-between align-items-end">
+            <div>
+                <small class="text-muted text-uppercase">Clínica Médica</small>
+                <h3 class="mb-0 fw-bold">Eduardo Moreno</h3>
+            </div>
+            <div class="text-end">
+                <div class="fw-bold">Consulta @c.Codigo</div>
+                <div class="text-muted small">Fecha: @c.Fecha.ToString("dd/MM/yyyy")</div>
+            </div>
+        </div>
+
+        <h6>Datos del paciente</h6>
+        <table class="table table-sm table-borderless mb-0">
+            <tr>
+                <td class="text-muted" style="width: 20%;">Paciente:</td>
+                <td class="fw-semibold" style="width: 40%;">@Model.NombrePaciente</td>
+                <td class="text-muted" style="width: 15%;">Expediente:</td>
+                <td>@Model.CodigoExpediente</td>
+            </tr>
+            <tr>
+                <td class="text-muted">Edad:</td>
+                <td>@(Model.EdadPaciente.HasValue ? $"{Model.EdadPaciente} años" : "—")</td>
+                <td class="text-muted">Sexo:</td>
+                <td>@(string.IsNullOrEmpty(Model.SexoPaciente) ? "—" : Model.SexoPaciente)</td>
+            </tr>
+        </table>
+
+        <h6>Motivo de consulta</h6>
+        <p style="white-space: pre-line;">@c.Motivo</p>
+
+        <h6>Signos vitales</h6>
+        <table class="table table-sm table-bordered text-center mb-0">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(m => m.Consulta.VitalPeso)</th>
+                    <th>@Html.DisplayNameFor(m => m.Consulta.VitalTemperatura)</th>
+                    <th>@Html.DisplayNameFor(m => m.Consulta.VitalPresion)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@(c.VitalPeso?.ToString("0.##") ?? "—")</td>
+                    <td>@(c.VitalTemperatura?.ToString("0.0") ?? "—")</td>
+                    <td>@(string.IsNullOrEmpty(c.VitalPresion) ? "—" : c.VitalPresion)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h6>Diagnóstico</h6>
+        @if (Model.Enfermedades.Any())
+        {
+            @foreach (var item in Model.Enfermedades)
+            {
+                <div class="mb-3">
+                    <div class="fw-semibold">@item.NombreEnfermedad <span class="text-muted small">(@item.TipoEnfermedad)</span></div>
+                    @if (!string.IsNullOrEmpty(item.Observaciones))
+                    {
+                        <div style="white-space: pre-line;">@item.Observaciones</div>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-muted">Sin diagnósticos registrados.</p>
+        }
+
+        @if (Model.Medicamentos.Any())
+        {
+            <h6>Receta médica @(Model.Receta != null ? $"({Model.Receta.Codigo})" : "")</h6>
+            <table class="table table-sm table-bordered mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">#</th>
+                        <th style="width: 35%;">Medicamento</th>
+                        <th style="width: 40%;">Prescripción</th>
+                        <th style="width: 20%;">Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var med in Model.Medicamentos)
+                    {
+                        <tr>
+                            <td>@med.Orden</td>
+                            <td class="fw-semibold">@med.NombreMedicamento</td>
+                            <td>@med.Prescripcion</td>
+                            <td>@med.Cantidad</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        <div class="d-flex justify-content-end">
+            <div class="firma">
+                <div class="fw-semibold">@(string.IsNullOrEmpty(c.Medico) ? "Médico tratante" : c.Medico)</div>
+                <div class="text-muted small">Firma y sello</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', function () { window.print(); });
+    </script>
+</body>
+</html>

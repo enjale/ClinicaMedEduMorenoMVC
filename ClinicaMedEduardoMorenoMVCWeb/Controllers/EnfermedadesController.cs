@@ -25,22 +25,32 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
             }
         }
 
-        public IActionResult Index(int pagina = 1)
+        public IActionResult Index(int pagina = 1, string? buscar = null)
         {
             if (pagina < 1) pagina = 1;
             int tamañoPagina = 10;
-            var totalRegistros = _context.Enfermedades.Count();
+
+            // Búsqueda por código o nombre
+            var query = _context.Enfermedades.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(buscar))
+            {
+                buscar = buscar.Trim();
+                query = query.Where(e => e.Codigo.Contains(buscar) || e.Nombre.Contains(buscar));
+            }
+
+            var totalRegistros = query.Count();
             var totalPaginas = (int)Math.Ceiling((double)totalRegistros / tamañoPagina);
             if (totalPaginas == 0) totalPaginas = 1;
 
             if (pagina > totalPaginas) pagina = totalPaginas;
 
-            var enfermedades = _context.Enfermedades
+            var enfermedades = query
                 .OrderByDescending(e => e.EnfermedadId)
                 .Skip((pagina - 1) * tamañoPagina)
                 .Take(tamañoPagina)
                 .ToList();
 
+            ViewBag.Buscar = buscar;
             ViewBag.PaginaActual = pagina;
             ViewBag.TotalPaginas = totalPaginas;
             ViewBag.TotalRegistros = totalRegistros;

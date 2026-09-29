@@ -1,7 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
-using ClinicaMedEduardoMorenoMVCWeb.Data;
-using ClinicaMedEduardoMorenoMVCWeb.Models;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 
 namespace ClinicaMedEduardoMorenoMVCWeb.Models
@@ -24,5 +22,9 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Models
 
         [Required(ErrorMessage = "La fecha de creación es obligatoria")]
         public DateTime FechaCreacion { get; set; }
+
+        // Propiedad de navegación
+        [ForeignKey("PacienteId")]
+        public virtual Pacientes? Paciente { get; set; }
     }
 }

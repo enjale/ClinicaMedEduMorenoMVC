@@ -53,6 +53,18 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Models
         [Display(Name = "Presión arterial")]
         public string? VitalPresion { get; set; }
 
+        [StringLength(1000)]
+        [Display(Name = "Diagnóstico")]
+        public string? Diagnostico { get; set; }
+
+        [StringLength(1000)]
+        [Display(Name = "Tratamiento")]
+        public string? Tratamiento { get; set; }
+
+        [StringLength(1000)]
+        [Display(Name = "Observaciones")]
+        public string? Observaciones { get; set; }
+
         [Required(ErrorMessage = "El estado es obligatorio")]
         [StringLength(20)]
         public string Estado { get; set; } = "pendiente";

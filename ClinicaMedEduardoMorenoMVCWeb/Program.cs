@@ -8,13 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // Registrar el contexto de base de datos
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-           .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning)));
+builder.Services.AddDbContext(options =>
+options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning)));
 
 // Configuración del servicio de correo con MailKit
 builder.Services.Configure<ClinicaMedEduardoMorenoMVCWeb.Models.EmailSettings>(
-    builder.Configuration.GetSection("EmailSettings"));
+builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddScoped<ClinicaMedEduardoMorenoMVCWeb.Services.IEmailService, ClinicaMedEduardoMorenoMVCWeb.Services.EmailService>();
 builder.Services.AddDataProtection();
 
@@ -27,21 +27,17 @@ builder.Services.AddSession(options =>
 });
 
 builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/Account/Login";
-        options.AccessDeniedPath = "/Account/Login";
-        options.ExpireTimeSpan = TimeSpan.FromHours(8);
-    });
+.AddCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/Login";
+    options.ExpireTimeSpan = TimeSpan.FromHours(8);
+});
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    // Ejecuta las migraciones automáticamente al iniciar el proyecto
-    db.Database.Migrate();
-}
+// Ejecuta las migraciones automáticamente al iniciar el proyecto
+ApplyMigrations(app);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -53,17 +49,24 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseSession();
 
 app.MapStaticAssets();
 
+// Configuración de rutas predeterminadas
 app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+name: "default",
+pattern: "{controller=Home}/{action=Index}/{id?}");
 
-
+// Iniciar la aplicación
 app.Run();
+
+// Función local: aplica migraciones de EF Core al iniciar
+static void ApplyMigrations(WebApplication application)
+{
+    using var scope = application.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService();
+    db.Database.Migrate();
+}

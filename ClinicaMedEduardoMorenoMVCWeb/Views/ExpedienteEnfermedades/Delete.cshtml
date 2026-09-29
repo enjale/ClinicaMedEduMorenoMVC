@@ -19,16 +19,16 @@
 <div class="row">
     <div class="col-md-6">
         <dl class="row">
-            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.ExpedienteId)</dt>
-            <dd class="col-sm-8">@Html.DisplayFor(model => model.ExpedienteId)</dd>
+            <dt class="col-sm-4">Expediente</dt>
+            <dd class="col-sm-8">@(Model.Expediente?.Codigo ?? Model.ExpedienteId.ToString())</dd>
 
-            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.EnfermedadId)</dt>
-            <dd class="col-sm-8">@Html.DisplayFor(model => model.EnfermedadId)</dd>
+            <dt class="col-sm-4">Enfermedad</dt>
+            <dd class="col-sm-8">@(Model.Enfermedad?.Nombre ?? Model.EnfermedadId.ToString())</dd>
 
-            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.FechaDeteccion)</dt>
-            <dd class="col-sm-8">@Model.FechaDeteccion.ToString("dd/MM/yyyy")</dd>
+            <dt class="col-sm-4">Fecha Detección</dt>
+            <dd class="col-sm-8">@(Model.FechaDeteccion?.ToString("dd/MM/yyyy") ?? "—")</dd>
 
-            <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Observaciones)</dt>
+            <dt class="col-sm-4">Observaciones</dt>
             <dd class="col-sm-8">@Html.DisplayFor(model => model.Observaciones)</dd>
         </dl>
 

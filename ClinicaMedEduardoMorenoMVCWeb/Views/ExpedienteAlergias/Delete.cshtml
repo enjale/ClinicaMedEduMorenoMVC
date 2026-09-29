@@ -1,0 +1,41 @@
+@model ClinicaMedEduardoMorenoMVCWeb.Models.ExpedienteAlergias
+
+@{
+	Layout = "_LayoutDoctor";
+	ViewData["Title"] = "Eliminar Expediente Alergia";
+	ViewData["Seccion"] = "Expediente Alergias";
+}
+
+<div class="mb-3">
+	<h1>Eliminar Alergia del Expediente</h1>
+	<a asp-action="Index" class="text-muted small">← Volver a la lista</a>
+</div>
+
+<hr />
+<div class="alert alert-danger" role="alert">
+	¿Está seguro que desea eliminar este registro? Esta acción no se puede deshacer.
+</div>
+
+<div class="row">
+	<div class="col-md-6">
+		<dl class="row">
+			<dt class="col-sm-4">Expediente</dt>
+			<dd class="col-sm-8">@(Model.Expediente?.Codigo ?? Model.ExpedienteId.ToString())</dd>
+
+			<dt class="col-sm-4">Alergia</dt>
+			<dd class="col-sm-8">@(Model.Alergia?.Nombre ?? Model.AlergiaId.ToString())</dd>
+
+			<dt class="col-sm-4">Nivel</dt>
+			<dd class="col-sm-8">@Html.DisplayFor(model => model.Nivel)</dd>
+
+			<dt class="col-sm-4">Observaciones</dt>
+			<dd class="col-sm-8">@Html.DisplayFor(model => model.Observaciones)</dd>
+		</dl>
+
+		<form asp-action="Delete" method="post">
+			<input type="hidden" asp-for="ExpedienteAlergiaId" />
+			<button type="submit" class="btn btn-danger">Confirmar Eliminación</button>
+			<a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+		</form>
+	</div>
+</div>

@@ -6,87 +6,87 @@ using ClinicaMedEduardoMorenoMVCWeb.Data;
 
 namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
 {
-    public class ExpedienteEnfermedadesController : Controller
+    public class ExpedienteAlergiasController : Controller
     {
         private readonly AppDbContext _context;
 
-        public ExpedienteEnfermedadesController(AppDbContext context)
+        public ExpedienteAlergiasController(AppDbContext context)
         {
             _context = context;
         }
 
-        // GET: ExpedienteEnfermedades
+        // GET: ExpedienteAlergias
         public async Task<IActionResult> Index()
         {
-            var lista = await _context.ExpedienteEnfermedades
+            var lista = await _context.ExpedienteAlergias
                 .Include(e => e.Expediente)
-                .Include(e => e.Enfermedad)
+                .Include(e => e.Alergia)
                 .ToListAsync();
             return View(lista);
         }
 
-        // GET: ExpedienteEnfermedades/Details/5
+        // GET: ExpedienteAlergias/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
 
-            var item = await _context.ExpedienteEnfermedades
+            var item = await _context.ExpedienteAlergias
                 .Include(e => e.Expediente)
-                .Include(e => e.Enfermedad)
-                .FirstOrDefaultAsync(m => m.ExpedienteEnfermedadId == id);
+                .Include(e => e.Alergia)
+                .FirstOrDefaultAsync(m => m.ExpedienteAlergiaId == id);
 
             if (item == null) return NotFound();
             return View(item);
         }
 
-        // GET: ExpedienteEnfermedades/Create?expedienteId=5
+        // GET: ExpedienteAlergias/Create?expedienteId=5
         public IActionResult Create(int? expedienteId)
         {
             ViewData["ExpedienteId"] = new SelectList(_context.Expedientes, "ExpedienteId", "Codigo", expedienteId);
-            ViewData["EnfermedadId"] = new SelectList(_context.Enfermedades, "EnfermedadId", "Nombre");
+            ViewData["AlergiaId"] = new SelectList(_context.Alergias, "AlergiaId", "Nombre");
             ViewBag.ExpedienteIdActual = expedienteId;
             return View();
         }
 
-        // POST: ExpedienteEnfermedades/Create
+        // POST: ExpedienteAlergias/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ExpedienteEnfermedadId,ExpedienteId,EnfermedadId,FechaDeteccion,Observaciones")] ExpedienteEnfermedades item)
+        public async Task<IActionResult> Create([Bind("ExpedienteAlergiaId,ExpedienteId,AlergiaId,Nivel,Observaciones")] ExpedienteAlergias item)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(item);
                 await _context.SaveChangesAsync();
-                // Redirigir al expediente con tab de alergias (la pestaña "Alergias y Enfermedades")
+                // Redirigir al expediente con tab de alergias
                 return RedirectToAction("Details", "Expedientes",
                     new { id = item.ExpedienteId, tab = "alergias" });
             }
             ViewData["ExpedienteId"] = new SelectList(_context.Expedientes, "ExpedienteId", "Codigo", item.ExpedienteId);
-            ViewData["EnfermedadId"] = new SelectList(_context.Enfermedades, "EnfermedadId", "Nombre", item.EnfermedadId);
+            ViewData["AlergiaId"] = new SelectList(_context.Alergias, "AlergiaId", "Nombre", item.AlergiaId);
             ViewBag.ExpedienteIdActual = item.ExpedienteId;
             return View(item);
         }
 
-        // GET: ExpedienteEnfermedades/Edit/5
+        // GET: ExpedienteAlergias/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
 
-            var item = await _context.ExpedienteEnfermedades.FindAsync(id);
+            var item = await _context.ExpedienteAlergias.FindAsync(id);
             if (item == null) return NotFound();
 
             ViewData["ExpedienteId"] = new SelectList(_context.Expedientes, "ExpedienteId", "Codigo", item.ExpedienteId);
-            ViewData["EnfermedadId"] = new SelectList(_context.Enfermedades, "EnfermedadId", "Nombre", item.EnfermedadId);
+            ViewData["AlergiaId"] = new SelectList(_context.Alergias, "AlergiaId", "Nombre", item.AlergiaId);
             ViewBag.ExpedienteIdActual = item.ExpedienteId;
             return View(item);
         }
 
-        // POST: ExpedienteEnfermedades/Edit/5
+        // POST: ExpedienteAlergias/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ExpedienteEnfermedadId,ExpedienteId,EnfermedadId,FechaDeteccion,Observaciones")] ExpedienteEnfermedades item)
+        public async Task<IActionResult> Edit(int id, [Bind("ExpedienteAlergiaId,ExpedienteId,AlergiaId,Nivel,Observaciones")] ExpedienteAlergias item)
         {
-            if (id != item.ExpedienteEnfermedadId) return NotFound();
+            if (id != item.ExpedienteAlergiaId) return NotFound();
 
             if (ModelState.IsValid)
             {
@@ -97,54 +97,53 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_context.ExpedienteEnfermedades.Any(e => e.ExpedienteEnfermedadId == id)) return NotFound();
+                    if (!_context.ExpedienteAlergias.Any(e => e.ExpedienteAlergiaId == id)) return NotFound();
                     else throw;
                 }
                 return RedirectToAction("Details", "Expedientes",
                     new { id = item.ExpedienteId, tab = "alergias" });
             }
             ViewData["ExpedienteId"] = new SelectList(_context.Expedientes, "ExpedienteId", "Codigo", item.ExpedienteId);
-            ViewData["EnfermedadId"] = new SelectList(_context.Enfermedades, "EnfermedadId", "Nombre", item.EnfermedadId);
-            ViewBag.ExpedienteIdActual = item.ExpedienteId;
+            ViewData["AlergiaId"] = new SelectList(_context.Alergias, "AlergiaId", "Nombre", item.AlergiaId);
             return View(item);
         }
 
-        // POST: DeleteFromExpediente (eliminar desde la vista de expediente)
+        // POST: ExpedienteAlergias/DeleteFromExpediente (eliminar desde la vista de expediente)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteFromExpediente(int id, int expedienteId)
         {
-            var item = await _context.ExpedienteEnfermedades.FindAsync(id);
+            var item = await _context.ExpedienteAlergias.FindAsync(id);
             if (item != null)
-                _context.ExpedienteEnfermedades.Remove(item);
+                _context.ExpedienteAlergias.Remove(item);
 
             await _context.SaveChangesAsync();
             return RedirectToAction("Details", "Expedientes",
                 new { id = expedienteId, tab = "alergias" });
         }
 
-        // GET: ExpedienteEnfermedades/Delete/5
+        // GET: ExpedienteAlergias/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
 
-            var item = await _context.ExpedienteEnfermedades
+            var item = await _context.ExpedienteAlergias
                 .Include(e => e.Expediente)
-                .Include(e => e.Enfermedad)
-                .FirstOrDefaultAsync(m => m.ExpedienteEnfermedadId == id);
+                .Include(e => e.Alergia)
+                .FirstOrDefaultAsync(m => m.ExpedienteAlergiaId == id);
 
             if (item == null) return NotFound();
             return View(item);
         }
 
-        // POST: ExpedienteEnfermedades/Delete/5
+        // POST: ExpedienteAlergias/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var item = await _context.ExpedienteEnfermedades.FindAsync(id);
+            var item = await _context.ExpedienteAlergias.FindAsync(id);
             int? expedienteId = item?.ExpedienteId;
-            if (item != null) _context.ExpedienteEnfermedades.Remove(item);
+            if (item != null) _context.ExpedienteAlergias.Remove(item);
 
             await _context.SaveChangesAsync();
 

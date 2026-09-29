@@ -1,0 +1,36 @@
+@model ClinicaMedEduardoMorenoMVCWeb.Models.Antecedentes
+
+@{
+	Layout = "_LayoutDoctor";
+	ViewData["Title"] = "Eliminar Antecedente";
+	ViewData["Seccion"] = "Antecedentes";
+}
+
+<h1>¿Está seguro de que desea eliminar este antecedente?</h1>
+
+<div class="card">
+	<div class="card-body">
+		<div class="mb-3">
+			<label class="form-label"><strong>Tipo:</strong></label>
+			<p>@Html.DisplayFor(model => model.Tipo)</p>
+		</div>
+
+		<div class="mb-3">
+			<label class="form-label"><strong>Descripción:</strong></label>
+			<p>@Html.DisplayFor(model => model.Descripcion)</p>
+		</div>
+
+		<div class="mb-3">
+			<label class="form-label"><strong>Fecha:</strong></label>
+			<p>@(Model.Fecha?.ToString("dd/MM/yyyy") ?? "N/A")</p>
+		</div>
+	</div>
+</div>
+
+<form asp-action="Delete" method="post">
+	<input type="hidden" asp-for="AntecedentesId" />
+	<div class="mt-3">
+		<button type="submit" class="btn btn-danger">Eliminar</button>
+		<a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+	</div>
+</form>

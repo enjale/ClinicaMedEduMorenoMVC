@@ -1,0 +1,423 @@
+@model ClinicaMedEduardoMorenoMVCWeb.Models.ViewModels.ExpedienteDetalleViewModel
+
+@{
+	Layout = "_LayoutDoctor";
+	ViewData["Title"] = "Expediente Clínico";
+	ViewData["Seccion"] = "Expedientes Clínicos";
+	var tab = Model.TabActiva;
+}
+
+<!-- Encabezado -->
+<div class="d-flex justify-content-between align-items-start mb-1">
+	<div>
+		<h2 style="font-weight:700; color:#1a1a1a; margin-bottom:0.15rem;">
+			@(Model.Paciente?.Nombre ?? "Paciente desconocido")
+		</h2>
+		<p style="color:#6B7280; font-size:0.9rem; margin:0;">
+			Expediente: <strong>@Model.Expediente.Codigo</strong> &nbsp;|&nbsp; Creado: <strong>@Model.Expediente.FechaCreacion.ToString("dd/MM/yyyy")</strong>
+		</p>
+	</div>
+	<a asp-action="Index" class="btn" style="background:white; border:1.5px solid #ccc; color:#374151; font-weight:600; padding:0.45rem 1.4rem; border-radius:4px;">
+		Cerrar
+	</a>
+</div>
+
+<hr style="margin: 0.75rem 0 0 0;" />
+
+<!-- Tabs de navegación -->
+<ul class="nav" style="border-bottom: 2px solid #e0e0e0; margin-bottom:1.5rem;">
+	<li class="nav-item">
+		<a href="@Url.Action("Details", "Expedientes", new { id = Model.Expediente.ExpedienteId, tab = "datos" })"
+		   class="tab-link @(tab=="datos" ? "tab-activo" : "")">
+			Datos del Paciente
+		</a>
+	</li>
+	<li class="nav-item">
+		<a href="@Url.Action("Details", "Expedientes", new { id = Model.Expediente.ExpedienteId, tab = "alergias" })"
+		   class="tab-link @(tab=="alergias" ? "tab-activo" : "")">
+			Alergias y Enfermedades
+		</a>
+	</li>
+	<li class="nav-item">
+		<a href="@Url.Action("Details", "Expedientes", new { id = Model.Expediente.ExpedienteId, tab = "antecedentes" })"
+		   class="tab-link @(tab=="antecedentes" ? "tab-activo" : "")">
+			Antecedentes
+		</a>
+	</li>
+	<li class="nav-item">
+		<a href="@Url.Action("Details", "Expedientes", new { id = Model.Expediente.ExpedienteId, tab = "consultas" })"
+		   class="tab-link @(tab=="consultas" ? "tab-activo" : "")">
+			Consultas
+		</a>
+	</li>
+</ul>
+
+<!-- ───── TAB: DATOS DEL PACIENTE ───── -->
+@if (tab == "datos")
+{
+	<div class="row g-4">
+		<div class="col-md-6">
+			<div class="seccion-card">
+				<h5 class="seccion-titulo">Información Personal</h5>
+				<dl class="row mb-0">
+					<dt class="col-sm-5 campo-label">Nombre completo</dt>
+					<dd class="col-sm-7">@(Model.Paciente?.Nombre ?? "—")</dd>
+
+					<dt class="col-sm-5 campo-label">Sexo</dt>
+					<dd class="col-sm-7">@(Model.Paciente?.Sexo == "M" ? "Masculino" : Model.Paciente?.Sexo == "F" ? "Femenino" : "—")</dd>
+
+					<dt class="col-sm-5 campo-label">Fecha de nacimiento</dt>
+					<dd class="col-sm-7">@(Model.Paciente?.FechaNac?.ToString("dd/MM/yyyy") ?? "—")</dd>
+
+					<dt class="col-sm-5 campo-label">DUI</dt>
+					<dd class="col-sm-7">@(Model.Paciente?.DUI ?? "—")</dd>
+
+					<dt class="col-sm-5 campo-label">Teléfono</dt>
+					<dd class="col-sm-7">@(Model.Paciente?.Telefono ?? "—")</dd>
+
+					<dt class="col-sm-5 campo-label">Dirección</dt>
+					<dd class="col-sm-7">@(Model.Paciente?.Direccion ?? "—")</dd>
+				</dl>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="seccion-card">
+				<h5 class="seccion-titulo">Medidas y Expediente</h5>
+				<dl class="row mb-0">
+					<dt class="col-sm-5 campo-label">Altura</dt>
+					<dd class="col-sm-7">@(Model.Paciente?.Altura.HasValue == true ? $"{Model.Paciente.Altura} m" : "—")</dd>
+
+					<dt class="col-sm-5 campo-label">Peso</dt>
+					<dd class="col-sm-7">@(Model.Paciente?.Peso.HasValue == true ? $"{Model.Paciente.Peso} kg" : "—")</dd>
+
+					<dt class="col-sm-5 campo-label">Código expediente</dt>
+					<dd class="col-sm-7" style="color:#4F6F52; font-weight:600;">@Model.Expediente.Codigo</dd>
+
+					<dt class="col-sm-5 campo-label">Fecha creación</dt>
+					<dd class="col-sm-7">@Model.Expediente.FechaCreacion.ToString("dd/MM/yyyy")</dd>
+				</dl>
+			</div>
+		</div>
+		<div class="col-12">
+			<div class="seccion-card">
+				<h5 class="seccion-titulo">Historial Médico</h5>
+				<div style="background:#FAFAF9; padding:1rem; border-radius:4px; border-left:4px solid #6B8E7A; color:#374151; line-height:1.6;">
+					@(string.IsNullOrWhiteSpace(Model.Expediente.Historial) ? "Sin historial registrado." : Model.Expediente.Historial)
+				</div>
+			</div>
+		</div>
+		<div class="col-12">
+			<div class="d-flex gap-2">
+				<a asp-controller="Expedientes" asp-action="Edit" asp-route-id="@Model.Expediente.ExpedienteId"
+				   class="btn btn-sm btn-clinica">Editar Expediente</a>
+				<a asp-controller="Expedientes" asp-action="Delete" asp-route-id="@Model.Expediente.ExpedienteId"
+				   class="btn btn-sm btn-peligro-outline">Eliminar</a>
+			</div>
+		</div>
+	</div>
+}
+
+<!-- ───── TAB: ALERGIAS Y ENFERMEDADES ───── -->
+@if (tab == "alergias")
+{
+	<!-- SECCIÓN ALERGIAS -->
+	<div class="mb-5">
+		<div class="d-flex justify-content-between align-items-center mb-3">
+			<h4 class="seccion-h4">Alergias</h4>
+			<a asp-controller="ExpedienteAlergias" asp-action="Create"
+			   asp-route-expedienteId="@Model.Expediente.ExpedienteId"
+			   class="btn btn-sm btn-clinica">
+				Agregar Alergia
+			</a>
+		</div>
+
+		<div class="tabla-wrap">
+			<table class="tabla-interna">
+				<thead>
+					<tr>
+						<th>Alergia</th>
+						<th>Nivel</th>
+						<th>Observaciones</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					@if (!Model.Alergias.Any())
+					{
+						<tr><td colspan="4" class="tabla-vacia">No hay alergias registradas.</td></tr>
+					}
+					@foreach (var a in Model.Alergias)
+					{
+						<tr>
+							<td>@(a.Alergia?.Nombre ?? a.AlergiaId.ToString())</td>
+							<td>@a.Nivel</td>
+							<td>@(string.IsNullOrEmpty(a.Observaciones) ? "—" : a.Observaciones)</td>
+							<td class="text-end">
+								<form asp-controller="ExpedienteAlergias" asp-action="DeleteFromExpediente" method="post" class="d-inline">
+									@Html.AntiForgeryToken()
+									<input type="hidden" name="id" value="@a.ExpedienteAlergiaId" />
+									<input type="hidden" name="expedienteId" value="@Model.Expediente.ExpedienteId" />
+									<button type="submit" class="btn btn-sm btn-peligro"
+											onclick="return confirm('¿Eliminar esta alergia?')">
+										Eliminar
+									</button>
+								</form>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<!-- SECCIÓN ENFERMEDADES CRÓNICAS -->
+	<div>
+		<div class="d-flex justify-content-between align-items-center mb-3">
+			<h4 class="seccion-h4">Enfermedades Crónicas</h4>
+			<a asp-controller="ExpedienteEnfermedades" asp-action="Create"
+			   asp-route-expedienteId="@Model.Expediente.ExpedienteId"
+			   class="btn btn-sm btn-clinica">
+				Agregar Enfermedad
+			</a>
+		</div>
+
+		<div class="tabla-wrap">
+			<table class="tabla-interna">
+				<thead>
+					<tr>
+						<th>Enfermedad</th>
+						<th>Tipo</th>
+						<th>Fecha Detección</th>
+						<th>Observaciones</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					@if (!Model.Enfermedades.Any())
+					{
+						<tr><td colspan="5" class="tabla-vacia">No hay enfermedades registradas.</td></tr>
+					}
+					@foreach (var e in Model.Enfermedades)
+					{
+						<tr>
+							<td>@(e.Enfermedad?.Nombre ?? e.EnfermedadId.ToString())</td>
+							<td>@(e.Enfermedad?.TipoEnfermedad ?? "—")</td>
+							<td>@(e.FechaDeteccion?.ToString("dd/MM/yyyy") ?? "—")</td>
+							<td>@(string.IsNullOrEmpty(e.Observaciones) ? "—" : e.Observaciones)</td>
+							<td class="text-end">
+								<form asp-controller="ExpedienteEnfermedades" asp-action="DeleteFromExpediente" method="post" class="d-inline">
+									@Html.AntiForgeryToken()
+									<input type="hidden" name="id" value="@e.ExpedienteEnfermedadId" />
+									<input type="hidden" name="expedienteId" value="@Model.Expediente.ExpedienteId" />
+									<button type="submit" class="btn btn-sm btn-peligro"
+											onclick="return confirm('¿Eliminar esta enfermedad?')">
+										Eliminar
+									</button>
+								</form>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+}
+
+<!-- ───── TAB: ANTECEDENTES ───── -->
+@if (tab == "antecedentes")
+{
+	<div class="d-flex justify-content-between align-items-center mb-3">
+		<h4 class="seccion-h4">Antecedentes Médicos</h4>
+		<a asp-controller="Antecedentes" asp-action="Create"
+		   asp-route-expedienteId="@Model.Expediente.ExpedienteId"
+		   class="btn btn-sm btn-clinica">
+			Agregar Antecedente
+		</a>
+	</div>
+
+	<div class="tabla-wrap">
+		<table class="tabla-interna">
+			<thead>
+				<tr>
+					<th>Código</th>
+					<th>Tipo</th>
+					<th>Descripción</th>
+					<th>Fecha</th>
+					<th>Observaciones</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				@if (!Model.Antecedentes.Any())
+				{
+					<tr><td colspan="6" class="tabla-vacia">No hay antecedentes registrados.</td></tr>
+				}
+				@foreach (var ant in Model.Antecedentes)
+				{
+					<tr>
+						<td style="color:#4F6F52; font-weight:600;">ANT-@ant.AntecedentesId.ToString("D3")</td>
+						<td>@ant.Tipo</td>
+						<td>@ant.Descripcion</td>
+						<td>@(ant.Fecha?.ToString("dd/MM/yyyy") ?? "—")</td>
+						<td>—</td>
+						<td class="text-end">
+							<a asp-controller="Antecedentes" asp-action="Edit" asp-route-id="@ant.AntecedentesId"
+							   class="btn btn-sm btn-clinica me-1">
+								Editar
+							</a>
+							<form asp-controller="Antecedentes" asp-action="DeleteFromExpediente" method="post" class="d-inline">
+								@Html.AntiForgeryToken()
+								<input type="hidden" name="id" value="@ant.AntecedentesId" />
+								<input type="hidden" name="expedienteId" value="@Model.Expediente.ExpedienteId" />
+								<button type="submit" class="btn btn-sm btn-peligro"
+										onclick="return confirm('¿Eliminar este antecedente?')">
+									Eliminar
+								</button>
+							</form>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+<!-- ───── TAB: CONSULTAS ───── -->
+@if (tab == "consultas")
+{
+	<div class="d-flex justify-content-between align-items-center mb-3">
+		<h4 class="seccion-h4">Consultas Médicas</h4>
+		<a asp-controller="Consultas" asp-action="Create"
+		   class="btn btn-sm btn-clinica">
+			+ Nueva Consulta
+		</a>
+	</div>
+	<div style="border:1px solid #e0e0e0; border-radius:6px; padding:2rem; text-align:center; color:#6B7280;">
+		<p>Las consultas de este paciente se gestionan desde el módulo de Consultas Médicas.</p>
+		<a asp-controller="Consultas" asp-action="Index" class="btn btn-sm btn-clinica">
+			Ir a Consultas
+		</a>
+	</div>
+}
+
+<style>
+	/* Tabs */
+	.tab-link {
+		display: block;
+		padding: 0.75rem 1.2rem;
+		text-decoration: none;
+		font-weight: 500;
+		color: #6B7280;
+		border-bottom: 3px solid transparent;
+		margin-bottom: -2px;
+		transition: color 0.15s, border-color 0.15s;
+	}
+	.tab-link:hover {
+		color: #2F3E34;
+		text-decoration: none;
+	}
+	.tab-activo {
+		color: #2F3E34 !important;
+		border-bottom: 3px solid #4F6F52 !important;
+		font-weight: 600;
+	}
+	/* Sección card */
+	.seccion-card {
+		background: #fff;
+		border: 1px solid #e0e0e0;
+		border-radius: 8px;
+		padding: 1.5rem;
+	}
+	.seccion-titulo {
+		font-weight: 700;
+		color: #2F3E34;
+		margin-bottom: 1rem;
+		border-bottom: 2px solid #E7ECE8;
+		padding-bottom: 0.5rem;
+	}
+	.seccion-h4 {
+		font-weight: 700;
+		color: #2F3E34;
+		margin: 0;
+	}
+	.campo-label {
+		color: #6B7280;
+		font-weight: 600;
+	}
+	/* Tabla interna */
+	.tabla-wrap {
+		border: 1px solid #e0e0e0;
+		border-radius: 6px;
+		overflow: hidden;
+	}
+	.tabla-interna {
+		width: 100%;
+		border-collapse: collapse;
+		background: white;
+	}
+	.tabla-interna thead th {
+		background: #f5f5f5;
+		padding: 0.75rem 1rem;
+		color: #374151;
+		font-weight: 600;
+		font-size: 0.88rem;
+		border-bottom: 1px solid #e0e0e0;
+	}
+	.tabla-interna tbody tr {
+		border-bottom: 1px solid #f0f0f0;
+		transition: background 0.12s;
+	}
+	.tabla-interna tbody tr:hover {
+		background: #f7faf7;
+	}
+	.tabla-interna td {
+		padding: 0.7rem 1rem;
+		font-size: 0.9rem;
+		color: #374151;
+		vertical-align: middle;
+	}
+	.tabla-vacia {
+		text-align: center;
+		padding: 1.5rem !important;
+		color: #9ca3af;
+	}
+	/* Botones */
+	.btn-clinica {
+		background: #4F6F52 !important;
+		color: white !important;
+		font-weight: 600;
+		border-radius: 4px;
+		padding: 0.4rem 1.1rem;
+		border: none;
+		transition: background 0.2s;
+	}
+	.btn-clinica:hover {
+		background: #3A5240 !important;
+		color: white !important;
+		text-decoration: none;
+	}
+	.btn-peligro {
+		background: #c0392b !important;
+		color: white !important;
+		font-weight: 600;
+		border-radius: 4px;
+		padding: 0.3rem 0.9rem;
+		border: none;
+	}
+	.btn-peligro:hover {
+		background: #a93226 !important;
+		color: white !important;
+	}
+	.btn-peligro-outline {
+		background: transparent !important;
+		color: #dc3545 !important;
+		border: 1.5px solid #dc3545 !important;
+		font-weight: 600;
+		border-radius: 4px;
+		padding: 0.3rem 0.9rem;
+	}
+	.btn-peligro-outline:hover {
+		background: #dc3545 !important;
+		color: white !important;
+	}
+</style>

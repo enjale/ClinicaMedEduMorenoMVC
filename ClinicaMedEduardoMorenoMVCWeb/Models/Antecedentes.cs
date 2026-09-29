@@ -1,7 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
-using ClinicaMedEduardoMorenoMVCWeb.Data;
-using ClinicaMedEduardoMorenoMVCWeb.Models;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClinicaMedEduardoMorenoMVCWeb.Models
 {
@@ -19,5 +17,11 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Models
         public string Descripcion { get; set; } = string.Empty;
 
         public DateTime? Fecha { get; set; }
+
+        // Vínculo con Expediente (nullable para no romper registros existentes)
+        public int? ExpedienteId { get; set; }
+
+        [ForeignKey("ExpedienteId")]
+        public virtual Expedientes? Expediente { get; set; }
     }
 }

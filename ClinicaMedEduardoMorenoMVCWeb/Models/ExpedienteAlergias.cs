@@ -1,7 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
-using ClinicaMedEduardoMorenoMVCWeb.Data;
-using ClinicaMedEduardoMorenoMVCWeb.Models;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ClinicaMedEduardoMorenoMVCWeb.Models
 {
@@ -22,5 +20,12 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Models
 
         [StringLength(500)]
         public string Observaciones { get; set; } = string.Empty;
+
+        // Propiedades de navegación
+        [ForeignKey("ExpedienteId")]
+        public virtual Expedientes? Expediente { get; set; }
+
+        [ForeignKey("AlergiaId")]
+        public virtual Alergias? Alergia { get; set; }
     }
 }

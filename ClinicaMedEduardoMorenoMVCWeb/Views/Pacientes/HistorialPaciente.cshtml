@@ -1,0 +1,169 @@
+@model IEnumerable<ClinicaMedEduardoMorenoMVCWeb.Models.Consultas>
+
+@{
+	Layout = "_LayoutDoctor";
+	ViewData["Title"] = "Historial de Consultas";
+	ViewData["Seccion"] = "Historial de Consultas";
+}
+
+<!-- Encabezado del Historial -->
+<div class="mb-4">
+	<h2 style="color: #4F6F52; font-weight: 700; margin-bottom: 0;">Historial de Consultas</h2>
+	<p style="color: #6B7280; font-size: 0.95rem;">Registro completo de todas las consultas y atenciones médicas</p>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-4" style="border: 1px solid #D6DDD8; border-radius: 6px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);">
+	<div class="card-body" style="padding: 1.5rem;">
+		<div class="row">
+			<div class="col-md-4">
+				<label style="font-weight: 600; color: #374151; display: block; margin-bottom: 0.35rem;">Filtrar por Fecha</label>
+				<input type="date" class="form-control" style="border-color: #D6DDD8; color: #374151;">
+			</div>
+			<div class="col-md-4">
+				<label style="font-weight: 600; color: #374151; display: block; margin-bottom: 0.35rem;">Filtrar por Médico</label>
+				<select class="form-control" style="border-color: #D6DDD8; color: #374151;">
+					<option>Todos los Médicos</option>
+					<option>Dr. Eduardo Moreno</option>
+					<option>Dr. Juan Pérez</option>
+				</select>
+			</div>
+			<div class="col-md-4">
+				<label style="font-weight: 600; color: #374151; display: block; margin-bottom: 0.35rem;">Buscar por Código</label>
+				<input type="text" class="form-control" placeholder="Ej: CON-2024-001" style="border-color: #D6DDD8; color: #374151;">
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Tabla de Historial -->
+<div class="card mb-4" style="border: 1px solid #D6DDD8; border-radius: 6px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03); overflow: hidden;">
+	<table class="table" style="margin: 0; background-color: #ffffff;">
+		<thead>
+			<tr style="background-color: #E7ECE8; border-bottom: 2px solid #D6DDD8;">
+				<th style="color: #2F3E34; font-weight: 700; padding: 0.85rem; border: none;">Código</th>
+				<th style="color: #2F3E34; font-weight: 700; padding: 0.85rem; border: none;">Fecha</th>
+				<th style="color: #2F3E34; font-weight: 700; padding: 0.85rem; border: none;">Médico</th>
+				<th style="color: #2F3E34; font-weight: 700; padding: 0.85rem; border: none;">Motivo</th>
+				<th style="color: #2F3E34; font-weight: 700; padding: 0.85rem; border: none;">Diagnóstico</th>
+				<th style="color: #2F3E34; font-weight: 700; padding: 0.85rem; border: none;">Peso (kg)</th>
+				<th style="color: #2F3E34; font-weight: 700; padding: 0.85rem; border: none;">Temp (°C)</th>
+				<th style="color: #2F3E34; font-weight: 700; padding: 0.85rem; border: none;">Acciones</th>
+			</tr>
+		</thead>
+		<tbody>
+			@if (Model != null && Model.Any())
+			{
+				@foreach (var consulta in Model.OrderByDescending(c => c.Fecha))
+				{
+					<tr style="border-bottom: 1px solid #F1F1F0; transition: background-color 0.2s ease;">
+						<td style="padding: 0.8rem; vertical-align: middle; color: #374151; font-weight: 600;">@Html.DisplayFor(modelItem => consulta.Codigo)</td>
+						<td style="padding: 0.8rem; vertical-align: middle; color: #374151;">@consulta.Fecha.ToString("dd/MM/yyyy")</td>
+						<td style="padding: 0.8rem; vertical-align: middle; color: #374151;">Dr. @Html.DisplayFor(modelItem => consulta.Medico)</td>
+						<td style="padding: 0.8rem; vertical-align: middle; color: #374151;">
+							<span style="display: inline-block; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+								@Html.DisplayFor(modelItem => consulta.Motivo)
+							</span>
+						</td>
+						<td style="padding: 0.8rem; vertical-align: middle; color: #374151;">
+							<span style="display: inline-block; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+								@Html.DisplayFor(modelItem => consulta.Diagnostico)
+							</span>
+						</td>
+						<td style="padding: 0.8rem; vertical-align: middle; color: #374151; text-align: center;">@Html.DisplayFor(modelItem => consulta.VitalPeso)</td>
+						<td style="padding: 0.8rem; vertical-align: middle; color: #374151; text-align: center;">@Html.DisplayFor(modelItem => consulta.VitalTemperatura)</td>
+						<td style="padding: 0.8rem; vertical-align: middle; text-align: center;">
+							<a asp-controller="Consultas" asp-action="Details" asp-route-id="@consulta.ConsultaId" class="btn btn-sm" style="background-color: transparent; color: #6B8E7A; font-weight: 600; padding: 0.35rem 0.7rem; border: 1px solid #6B8E7A; border-radius: 4px; text-decoration: none; font-size: 0.85rem;">Ver</a>
+						</td>
+					</tr>
+				}
+			}
+			else
+			{
+				<tr>
+					<td colspan="8" style="padding: 2rem; text-align: center; color: #6B7280;">
+						No hay consultas registradas
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</div>
+
+<!-- Sección de Timeline (Vista alternativa) -->
+<div class="mt-5">
+	<h4 style="color: #4F6F52; font-weight: 700; margin-bottom: 2rem;">Línea de Tiempo de Consultas</h4>
+
+	<div style="position: relative; padding: 1rem 0;">
+		<!-- Línea vertical -->
+		<div style="position: absolute; left: 15px; top: 0; bottom: 0; width: 2px; background-color: #A3B18A;"></div>
+
+		@if (Model != null && Model.Any())
+		{
+			@foreach (var consulta in Model.OrderByDescending(c => c.Fecha))
+			{
+				<div class="card mb-3" style="margin-left: 3rem; border: 1px solid #D6DDD8; border-radius: 6px; position: relative; overflow: hidden;">
+					<!-- Punto en la línea -->
+					<div style="position: absolute; left: -2.2rem; top: 1.5rem; width: 16px; height: 16px; background-color: #4F6F52; border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 0 0 2px #A3B18A;"></div>
+
+					<div class="card-body" style="padding: 1rem;">
+						<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+							<div>
+								<h5 style="color: #2F3E34; font-weight: 700; margin-bottom: 0.25rem;">@consulta.Fecha.ToString("dd 'de' MMMM 'de' yyyy")</h5>
+								<small style="color: #6B7280; font-weight: 600;">Código: @Html.DisplayFor(modelItem => consulta.Codigo)</small>
+							</div>
+							<span style="background-color: #E7ECE8; color: #2F3E34; padding: 0.35rem 0.7rem; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">
+								Dr. @Html.DisplayFor(modelItem => consulta.Medico)
+							</span>
+						</div>
+
+						<div style="background-color: #FAFAF9; padding: 0.75rem; border-radius: 4px; margin-bottom: 0.75rem; border-left: 3px solid #6B8E7A;">
+							<p style="color: #374151; margin: 0; font-size: 0.95rem;">
+								<strong>Motivo:</strong> @Html.DisplayFor(modelItem => consulta.Motivo)
+							</p>
+						</div>
+
+						<div class="row" style="font-size: 0.95rem;">
+							<div class="col-md-6">
+								<p style="color: #6B7280; margin-bottom: 0.5rem;">
+									<strong style="color: #2F3E34;">Diagnóstico:</strong> @Html.DisplayFor(modelItem => consulta.Diagnostico)
+								</p>
+							</div>
+							<div class="col-md-6">
+								<p style="color: #6B7280; margin-bottom: 0.5rem;">
+									<strong style="color: #2F3E34;">Tratamiento:</strong> @Html.DisplayFor(modelItem => consulta.Tratamiento)
+								</p>
+							</div>
+						</div>
+
+						<div class="row" style="font-size: 0.9rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #D6DDD8;">
+							<div class="col-4">
+								<small style="color: #6B7280;">Peso</small>
+								<p style="color: #2F3E34; font-weight: 600; margin: 0;">@Html.DisplayFor(modelItem => consulta.VitalPeso) kg</p>
+							</div>
+							<div class="col-4">
+								<small style="color: #6B7280;">Temperatura</small>
+								<p style="color: #2F3E34; font-weight: 600; margin: 0;">@Html.DisplayFor(modelItem => consulta.VitalTemperatura) °C</p>
+							</div>
+							<div class="col-4">
+								<small style="color: #6B7280;">Observaciones</small>
+								<p style="color: #2F3E34; font-weight: 600; margin: 0;">
+									<span style="display: inline-block; max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+										@(string.IsNullOrEmpty(consulta.Observaciones) ? "N/A" : consulta.Observaciones)
+									</span>
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			}
+		}
+	</div>
+</div>
+
+<!-- Botones de Acción -->
+<div class="mt-4" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+	<a asp-controller="Consultas" asp-action="Create" class="btn" style="background-color: #6B8E7A; color: white; font-weight: 600; padding: 0.6rem 1.2rem; border-radius: 4px; text-decoration: none;">+ Nueva Consulta</a>
+	<a href="#" class="btn" style="background-color: #6B8E7A; color: white; font-weight: 600; padding: 0.6rem 1.2rem; border-radius: 4px; text-decoration: none;">Descargar PDF</a>
+	<a asp-controller="Expedientes" asp-action="Index" class="btn" style="background-color: transparent; color: #6B8E7A; font-weight: 600; padding: 0.6rem 1.2rem; border: 1.5px solid #6B8E7A; border-radius: 4px; text-decoration: none;">Volver</a>
+</div>

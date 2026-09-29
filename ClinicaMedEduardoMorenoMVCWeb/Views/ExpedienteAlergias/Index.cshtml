@@ -1,14 +1,14 @@
-@model IEnumerable<ClinicaMedEduardoMorenoMVCWeb.Models.ExpedienteEnfermedades>
+@model IEnumerable<ClinicaMedEduardoMorenoMVCWeb.Models.ExpedienteAlergias>
 
 @{
 	Layout = "_LayoutDoctor";
-	ViewData["Title"] = "Enfermedades en Expedientes";
-	ViewData["Seccion"] = "Enfermedades en Expedientes";
+	ViewData["Title"] = "Alergias en Expedientes";
+	ViewData["Seccion"] = "Alergias en Expedientes";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-	<h2 class="mb-0" style="font-weight:700; color:#2F3E34;">Enfermedades Crónicas Registradas</h2>
-	<a asp-action="Create" class="btn btn-clinica">+ Agregar Enfermedad</a>
+	<h2 class="mb-0" style="font-weight:700; color:#2F3E34;">Alergias Registradas</h2>
+	<a asp-action="Create" class="btn btn-clinica">+ Agregar Alergia</a>
 </div>
 
 <div style="border:1px solid #e0e0e0; border-radius:6px; overflow:hidden;">
@@ -16,9 +16,8 @@
 		<thead style="background:#4F6F52; color:white;">
 			<tr>
 				<th style="font-weight:600; padding:0.85rem 1rem; color:white;">Expediente</th>
-				<th style="font-weight:600; padding:0.85rem 1rem; color:white;">Enfermedad</th>
-				<th style="font-weight:600; padding:0.85rem 1rem; color:white;">Tipo</th>
-				<th style="font-weight:600; padding:0.85rem 1rem; color:white;">Fecha Detección</th>
+				<th style="font-weight:600; padding:0.85rem 1rem; color:white;">Alergia</th>
+				<th style="font-weight:600; padding:0.85rem 1rem; color:white;">Nivel</th>
 				<th style="font-weight:600; padding:0.85rem 1rem; color:white;">Observaciones</th>
 				<th style="font-weight:600; padding:0.85rem 1rem; color:white;">Acciones</th>
 			</tr>
@@ -27,7 +26,7 @@
 			@if (!Model.Any())
 			{
 				<tr>
-					<td colspan="6" class="text-center py-4 text-muted">No hay enfermedades registradas.</td>
+					<td colspan="5" class="text-center py-4 text-muted">No hay alergias registradas.</td>
 				</tr>
 			}
 			@foreach (var item in Model)
@@ -36,28 +35,35 @@
 					<td style="padding:0.75rem 1rem; color:#4F6F52; font-weight:600;">
 						@(item.Expediente?.Codigo ?? item.ExpedienteId.ToString())
 					</td>
-					<td style="padding:0.75rem 1rem; font-weight:600; color:#2F3E34;">
-						@(item.Enfermedad?.Nombre ?? item.EnfermedadId.ToString())
-					</td>
-					<td style="padding:0.75rem 1rem; color:#6B7280;">
-						@(item.Enfermedad?.TipoEnfermedad ?? "—")
-					</td>
+					<td style="padding:0.75rem 1rem;">@(item.Alergia?.Nombre ?? item.AlergiaId.ToString())</td>
 					<td style="padding:0.75rem 1rem;">
-						@(item.FechaDeteccion?.ToString("dd/MM/yyyy") ?? "—")
+						@{
+							var badgeColor = item.Nivel switch
+							{
+								"Leve" => "#27ae60",
+								"Moderado" => "#f39c12",
+								"Severo" => "#e67e22",
+								"Muy Severo" => "#c0392b",
+								_ => "#6B7280"
+							};
+						}
+						<span style="background:@badgeColor; color:white; padding:0.2rem 0.7rem; border-radius:4px; font-size:0.82rem; font-weight:600;">
+							@item.Nivel
+						</span>
 					</td>
 					<td style="padding:0.75rem 1rem; color:#6B7280;">
 						@(string.IsNullOrEmpty(item.Observaciones) ? "—" : item.Observaciones)
 					</td>
 					<td style="padding:0.75rem 1rem;">
-						<a asp-action="Details" asp-route-id="@item.ExpedienteEnfermedadId"
+						<a asp-action="Details" asp-route-id="@item.ExpedienteAlergiaId"
 						   class="btn btn-sm" style="background:#f5f5f5; color:#374151; font-weight:600; border-radius:4px; padding:0.3rem 0.8rem; border:1px solid #ddd;">
 							Ver
 						</a>
-						<a asp-action="Edit" asp-route-id="@item.ExpedienteEnfermedadId"
+						<a asp-action="Edit" asp-route-id="@item.ExpedienteAlergiaId"
 						   class="btn btn-sm btn-clinica ms-1">
 							Editar
 						</a>
-						<a asp-action="Delete" asp-route-id="@item.ExpedienteEnfermedadId"
+						<a asp-action="Delete" asp-route-id="@item.ExpedienteAlergiaId"
 						   class="btn btn-sm btn-peligro-outline ms-1">
 							Eliminar
 						</a>
@@ -69,7 +75,7 @@
 </div>
 
 <div class="mt-3 text-muted small">
-	@Model.Count() enfermedad(es) encontrada(s)
+	@Model.Count() alergia(s) encontrada(s)
 </div>
 
 <style>

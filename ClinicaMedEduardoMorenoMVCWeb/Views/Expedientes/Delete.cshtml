@@ -1,0 +1,41 @@
+@model ClinicaMedEduardoMorenoMVCWeb.Models.Expedientes
+
+@{
+	Layout = "_LayoutDoctor";
+	ViewData["Title"] = "Eliminar Expediente";
+	ViewData["Seccion"] = "Expedientes";
+}
+
+<div class="mb-3">
+	<h1>Eliminar Expediente</h1>
+	<a asp-action="Index" class="text-muted small">← Volver a la lista</a>
+</div>
+
+<hr />
+<div class="alert alert-danger" role="alert">
+	¿Está seguro que desea eliminar este expediente? Esta acción no se puede deshacer.
+</div>
+
+<div class="row">
+	<div class="col-md-6">
+		<dl class="row">
+			<dt class="col-sm-4">Código</dt>
+			<dd class="col-sm-8">@Html.DisplayFor(model => model.Codigo)</dd>
+
+			<dt class="col-sm-4">Paciente</dt>
+			<dd class="col-sm-8">@(Model.Paciente?.Nombre ?? Model.PacienteId.ToString())</dd>
+
+			<dt class="col-sm-4">Historial</dt>
+			<dd class="col-sm-8">@Html.DisplayFor(model => model.Historial)</dd>
+
+			<dt class="col-sm-4">Fecha Creación</dt>
+			<dd class="col-sm-8">@Model.FechaCreacion.ToString("dd/MM/yyyy")</dd>
+		</dl>
+
+		<form asp-action="Delete" method="post">
+			<input type="hidden" asp-for="ExpedienteId" />
+			<button type="submit" class="btn btn-danger">Confirmar Eliminación</button>
+			<a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+		</form>
+	</div>
+</div>

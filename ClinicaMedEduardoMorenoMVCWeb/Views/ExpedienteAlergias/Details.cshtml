@@ -1,0 +1,96 @@
+@model ClinicaMedEduardoMorenoMVCWeb.Models.ExpedienteAlergias
+
+@{
+	Layout = "_LayoutDoctor";
+	ViewData["Title"] = "Detalle de Alergia";
+	ViewData["Seccion"] = "Expedientes Clínicos";
+}
+
+<div class="d-flex justify-content-between align-items-start mb-3">
+	<div>
+		<h4 style="font-weight:700; color:#2F3E34; margin-bottom:0.15rem;">Detalle de Alergia en Expediente</h4>
+		<a href="@Url.Action("Details", "Expedientes", new { id = Model.ExpedienteId, tab = "alergias" })"
+		   style="color:#6B7280; font-size:0.9rem; text-decoration:none;">
+			← Volver al expediente
+		</a>
+	</div>
+</div>
+
+<hr style="margin: 0 0 1.5rem 0;" />
+
+<div class="row">
+	<div class="col-md-6">
+		<div class="seccion-card">
+			<h5 class="seccion-titulo">Información de la Alergia</h5>
+			<dl class="row mb-0">
+				<dt class="col-sm-4 campo-label">Expediente</dt>
+				<dd class="col-sm-8">@(Model.Expediente?.Codigo ?? Model.ExpedienteId.ToString())</dd>
+
+				<dt class="col-sm-4 campo-label">Alergia</dt>
+				<dd class="col-sm-8" style="font-weight:600; color:#2F3E34;">@(Model.Alergia?.Nombre ?? Model.AlergiaId.ToString())</dd>
+
+				<dt class="col-sm-4 campo-label">Nivel de Severidad</dt>
+				<dd class="col-sm-8">
+					@{
+						var badgeColor = Model.Nivel switch
+						{
+							"Leve" => "#27ae60",
+							"Moderado" => "#f39c12",
+							"Severo" => "#e67e22",
+							"Muy Severo" => "#c0392b",
+							_ => "#6B7280"
+						};
+					}
+					<span style="background:@badgeColor; color:white; padding:0.2rem 0.7rem; border-radius:4px; font-size:0.85rem; font-weight:600;">
+						@Model.Nivel
+					</span>
+				</dd>
+
+				<dt class="col-sm-4 campo-label">Observaciones</dt>
+				<dd class="col-sm-8">@(string.IsNullOrEmpty(Model.Observaciones) ? "—" : Model.Observaciones)</dd>
+			</dl>
+		</div>
+
+		<div class="d-flex gap-2 mt-3">
+			<a asp-action="Edit" asp-route-id="@Model.ExpedienteAlergiaId" class="btn btn-clinica">
+				Editar
+			</a>
+			<a href="@Url.Action("Details", "Expedientes", new { id = Model.ExpedienteId, tab = "alergias" })"
+			   class="btn" style="border:1.5px solid #ccc; color:#374151; font-weight:600; border-radius:4px; padding:0.4rem 1.1rem;">
+				Volver al Expediente
+			</a>
+		</div>
+	</div>
+</div>
+
+<style>
+	.seccion-card {
+		background: #fff;
+		border: 1px solid #e0e0e0;
+		border-radius: 8px;
+		padding: 1.5rem;
+	}
+	.seccion-titulo {
+		font-weight: 700;
+		color: #2F3E34;
+		margin-bottom: 1rem;
+		border-bottom: 2px solid #E7ECE8;
+		padding-bottom: 0.5rem;
+	}
+	.campo-label {
+		color: #6B7280;
+		font-weight: 600;
+	}
+	.btn-clinica {
+		background: #4F6F52 !important;
+		color: white !important;
+		font-weight: 600;
+		border-radius: 4px;
+		padding: 0.4rem 1.1rem;
+		border: none;
+	}
+	.btn-clinica:hover {
+		background: #3A5240 !important;
+		color: white !important;
+	}
+</style>

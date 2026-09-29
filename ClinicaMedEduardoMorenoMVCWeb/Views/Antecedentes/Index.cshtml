@@ -1,0 +1,105 @@
+@model IEnumerable<ClinicaMedEduardoMorenoMVCWeb.Models.Antecedentes>
+
+@{
+	Layout = "_LayoutDoctor";
+	ViewData["Title"] = "Antecedentes Médicos";
+	ViewData["Seccion"] = "Antecedentes";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+	<h4 style="font-weight:700; color:#2F3E34; margin:0;">Antecedentes Médicos</h4>
+	<a asp-action="Create" class="btn btn-clinica">+ Nuevo Antecedente</a>
+</div>
+
+<div class="tabla-wrap">
+	<table class="tabla-interna">
+		<thead>
+			<tr>
+				<th>Código</th>
+				<th>Tipo</th>
+				<th>Descripción</th>
+				<th>Fecha</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			@if (!Model.Any())
+			{
+				<tr><td colspan="5" class="tabla-vacia">No hay antecedentes registrados.</td></tr>
+			}
+			@foreach (var item in Model)
+			{
+				<tr>
+					<td style="color:#4F6F52; font-weight:600;">ANT-@item.AntecedentesId.ToString("D3")</td>
+					<td>@item.Tipo</td>
+					<td>@item.Descripcion</td>
+					<td>@(item.Fecha?.ToString("dd/MM/yyyy") ?? "—")</td>
+					<td class="text-end">
+						@if (item.ExpedienteId.HasValue)
+						{
+							<a href="@Url.Action("Details", "Expedientes", new { id = item.ExpedienteId, tab = "antecedentes" })"
+							   class="btn btn-sm btn-clinica me-1">Ver Expediente</a>
+						}
+						<a asp-action="Edit" asp-route-id="@item.AntecedentesId" class="btn btn-sm btn-clinica me-1">Editar</a>
+						<a asp-action="Delete" asp-route-id="@item.AntecedentesId" class="btn btn-sm btn-peligro">Eliminar</a>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</div>
+
+<style>
+	.tabla-wrap {
+		border: 1px solid #e0e0e0;
+		border-radius: 6px;
+		overflow: hidden;
+	}
+	.tabla-interna {
+		width: 100%;
+		border-collapse: collapse;
+		background: white;
+	}
+	.tabla-interna thead th {
+		background: #f5f5f5;
+		padding: 0.75rem 1rem;
+		color: #374151;
+		font-weight: 600;
+		font-size: 0.88rem;
+		border-bottom: 1px solid #e0e0e0;
+	}
+	.tabla-interna tbody tr {
+		border-bottom: 1px solid #f0f0f0;
+		transition: background 0.12s;
+	}
+	.tabla-interna tbody tr:hover { background: #f7faf7; }
+	.tabla-interna td {
+		padding: 0.7rem 1rem;
+		font-size: 0.9rem;
+		color: #374151;
+		vertical-align: middle;
+	}
+	.tabla-vacia {
+		text-align: center;
+		padding: 1.5rem !important;
+		color: #9ca3af;
+	}
+	.btn-clinica {
+		background: #4F6F52 !important;
+		color: white !important;
+		font-weight: 600;
+		border-radius: 4px;
+		padding: 0.4rem 1.1rem;
+		border: none;
+	}
+	.btn-clinica:hover { background: #3A5240 !important; color: white !important; }
+	.btn-peligro {
+		background: #c0392b !important;
+		color: white !important;
+		font-weight: 600;
+		border-radius: 4px;
+		padding: 0.3rem 0.9rem;
+		border: none;
+	}
+	.btn-peligro:hover { background: #a93226 !important; color: white !important; }
+</style>

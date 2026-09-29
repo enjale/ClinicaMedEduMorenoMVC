@@ -1,8 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
-using ClinicaMedEduardoMorenoMVCWeb.Data;
-using ClinicaMedEduardoMorenoMVCWeb.Models;
 using System.ComponentModel.DataAnnotations;
-
 
 namespace ClinicaMedEduardoMorenoMVCWeb.Models
 {

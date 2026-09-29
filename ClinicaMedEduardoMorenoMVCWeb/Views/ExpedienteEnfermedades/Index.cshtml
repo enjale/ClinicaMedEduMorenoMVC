@@ -11,54 +11,54 @@
 	<a asp-action="Create" class="btn btn-clinica">+ Agregar Enfermedad</a>
 </div>
 
-<div style="border:1px solid #e0e0e0; border-radius:6px; overflow:hidden;">
-	<table class="table table-hover mb-0">
-		<thead style="background:#4F6F52; color:white;">
+<div class="tabla-wrap">
+	<table class="tabla-interna">
+		<thead>
 			<tr>
-				<th style="font-weight:600; padding:0.85rem 1rem; color:white;">Expediente</th>
-				<th style="font-weight:600; padding:0.85rem 1rem; color:white;">Enfermedad</th>
-				<th style="font-weight:600; padding:0.85rem 1rem; color:white;">Tipo</th>
-				<th style="font-weight:600; padding:0.85rem 1rem; color:white;">Fecha Detección</th>
-				<th style="font-weight:600; padding:0.85rem 1rem; color:white;">Observaciones</th>
-				<th style="font-weight:600; padding:0.85rem 1rem; color:white;">Acciones</th>
+				<th>Expediente</th>
+				<th>Enfermedad</th>
+				<th>Tipo</th>
+				<th>Fecha Detección</th>
+				<th>Observaciones</th>
+				<th class="text-end">Acciones</th>
 			</tr>
 		</thead>
 		<tbody>
 			@if (!Model.Any())
 			{
 				<tr>
-					<td colspan="6" class="text-center py-4 text-muted">No hay enfermedades registradas.</td>
+					<td colspan="6" class="tabla-vacia">No hay enfermedades registradas.</td>
 				</tr>
 			}
 			@foreach (var item in Model)
 			{
 				<tr>
-					<td style="padding:0.75rem 1rem; color:#4F6F52; font-weight:600;">
+					<td style="color:#4F6F52; font-weight:600;">
 						@(item.Expediente?.Codigo ?? item.ExpedienteId.ToString())
 					</td>
-					<td style="padding:0.75rem 1rem; font-weight:600; color:#2F3E34;">
+					<td style="font-weight:600; color:#2F3E34;">
 						@(item.Enfermedad?.Nombre ?? item.EnfermedadId.ToString())
 					</td>
-					<td style="padding:0.75rem 1rem; color:#6B7280;">
+					<td class="text-muted">
 						@(item.Enfermedad?.TipoEnfermedad ?? "—")
 					</td>
-					<td style="padding:0.75rem 1rem;">
+					<td>
 						@(item.FechaDeteccion?.ToString("dd/MM/yyyy") ?? "—")
 					</td>
-					<td style="padding:0.75rem 1rem; color:#6B7280;">
+					<td class="text-muted">
 						@(string.IsNullOrEmpty(item.Observaciones) ? "—" : item.Observaciones)
 					</td>
-					<td style="padding:0.75rem 1rem;">
+					<td class="text-end">
 						<a asp-action="Details" asp-route-id="@item.ExpedienteEnfermedadId"
-						   class="btn btn-sm" style="background:#f5f5f5; color:#374151; font-weight:600; border-radius:4px; padding:0.3rem 0.8rem; border:1px solid #ddd;">
+						   class="btn btn-sm btn-outline-secondary me-1">
 							Ver
 						</a>
 						<a asp-action="Edit" asp-route-id="@item.ExpedienteEnfermedadId"
-						   class="btn btn-sm btn-clinica ms-1">
+						   class="btn btn-sm btn-clinica me-1">
 							Editar
 						</a>
 						<a asp-action="Delete" asp-route-id="@item.ExpedienteEnfermedadId"
-						   class="btn btn-sm btn-peligro-outline ms-1">
+						   class="btn btn-sm btn-peligro">
 							Eliminar
 						</a>
 					</td>
@@ -71,31 +71,3 @@
 <div class="mt-3 text-muted small">
 	@Model.Count() enfermedad(es) encontrada(s)
 </div>
-
-<style>
-	.btn-clinica {
-		background: #4F6F52 !important;
-		color: white !important;
-		font-weight: 600;
-		border-radius: 4px;
-		padding: 0.35rem 1rem;
-		border: none;
-	}
-	.btn-clinica:hover {
-		background: #3A5240 !important;
-		color: white !important;
-		text-decoration: none;
-	}
-	.btn-peligro-outline {
-		background: transparent !important;
-		color: #dc3545 !important;
-		border: 1.5px solid #dc3545 !important;
-		font-weight: 600;
-		border-radius: 4px;
-		padding: 0.3rem 0.8rem;
-	}
-	.btn-peligro-outline:hover {
-		background: #dc3545 !important;
-		color: white !important;
-	}
-</style>

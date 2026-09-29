@@ -1,57 +1,156 @@
 @model ClinicaMedEduardoMorenoMVCWeb.Models.Expedientes
 
 @{
-	Layout = "_LayoutDoctor";
-	ViewData["Title"] = "Editar Expediente";
-	ViewData["Seccion"] = "Expedientes";
+    Layout = "_LayoutDoctor";
+    ViewData["Title"] = "Editar Expediente";
+    ViewData["Seccion"] = "Expedientes";
+    var pac = Model.Paciente;
 }
 
-<div class="mb-3">
-	<h1>Editar Expediente</h1>
-	<a asp-action="Index" class="text-muted small">← Volver a la lista</a>
+<!-- Encabezado -->
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h4 style="font-weight:700; color:#2F3E34; margin-bottom:0.15rem;">Editar Expediente</h4>
+        <a asp-action="Details" asp-route-id="@Model.ExpedienteId"
+           style="color:#6B7280; font-size:0.9rem; text-decoration:none;">
+            ← Volver al expediente
+        </a>
+    </div>
 </div>
 
-<hr />
-<div class="row">
-	<div class="col-md-6">
-		<form asp-action="Edit" method="post">
-			<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-			<input type="hidden" asp-for="ExpedienteId" />
+<hr style="margin: 0 0 1.5rem 0;" />
 
-			<div class="form-group mb-3">
-				<label asp-for="PacienteId" class="form-label"></label>
-				<select asp-for="PacienteId" class="form-select" asp-items="ViewBag.PacienteId">
-					<option value="">-- Seleccione un paciente --</option>
-				</select>
-				<span asp-validation-for="PacienteId" class="text-danger"></span>
-			</div>
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
 
-			<div class="form-group mb-3">
-				<label asp-for="Codigo" class="form-label"></label>
-				<input asp-for="Codigo" class="form-control" />
-				<span asp-validation-for="Codigo" class="text-danger"></span>
-			</div>
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+    <input type="hidden" asp-for="ExpedienteId" />
+    <input type="hidden" asp-for="PacienteId" />
+    <input type="hidden" asp-for="FechaCreacion" />
+    <input type="hidden" asp-for="Codigo" />
+    <input type="hidden" asp-for="Historial" />
 
-			<div class="form-group mb-3">
-				<label asp-for="Historial" class="form-label"></label>
-				<textarea asp-for="Historial" class="form-control" rows="5"></textarea>
-				<span asp-validation-for="Historial" class="text-danger"></span>
-			</div>
+    <!-- ===== SECCIÓN 1: DATOS DEL PACIENTE ===== -->
+    <div class="seccion-card mb-4">
+        <h6 class="seccion-card-title">
+            <i class="bi bi-person-fill me-2"></i>Datos del Paciente
+        </h6>
 
-			<div class="form-group mb-3">
-				<label asp-for="FechaCreacion" class="form-label"></label>
-				<input asp-for="FechaCreacion" type="date" class="form-control" />
-				<span asp-validation-for="FechaCreacion" class="text-danger"></span>
-			</div>
+        <div class="row g-3">
+            <div class="col-md-8">
+                <label class="form-label fw-semibold">Nombre Completo *</label>
+                <input type="text" name="PNombre" class="form-control"
+                       value="@pac?.Nombre" placeholder="Nombre completo" required />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Sexo *</label>
+                <select name="PSexo" class="form-select" required>
+                    <option value="">-- Seleccione --</option>
+                    @if (pac?.Sexo == "M")
+                    {
+                        <option value="M" selected>Masculino</option>
+                        <option value="F">Femenino</option>
+                    }
+                    else if (pac?.Sexo == "F")
+                    {
+                        <option value="M">Masculino</option>
+                        <option value="F" selected>Femenino</option>
+                    }
+                    else
+                    {
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>
+                    }
+                </select>
+            </div>
 
-			<div class="form-group mt-4">
-				<button type="submit" class="btn btn-primary">Guardar Cambios</button>
-				<a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
-			</div>
-		</form>
-	</div>
-</div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Fecha de Nacimiento</label>
+                <input type="date" name="PFechaNac" class="form-control"
+                       value="@pac?.FechaNac?.ToString("yyyy-MM-dd")"
+                       max="@DateTime.Today.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">DUI</label>
+                <input type="text" name="PDUI" id="editDUI" class="form-control"
+                       value="@pac?.DUI" placeholder="00000000-0" maxlength="10" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Teléfono</label>
+                <input type="text" name="PTelefono" id="editTelefono" class="form-control"
+                       value="@pac?.Telefono" placeholder="0000-0000" maxlength="9" />
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Altura (m)</label>
+                <input type="number" name="PAltura" class="form-control" step="0.01"
+                       value="@pac?.Altura" placeholder="Ej. 1.75" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Peso (kg)</label>
+                <input type="number" name="PPeso" class="form-control" step="0.1"
+                       value="@pac?.Peso" placeholder="Ej. 70.5" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Dirección</label>
+                <input type="text" name="PDireccion" class="form-control"
+                       value="@pac?.Direccion" placeholder="Dirección de residencia" />
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SECCIÓN 2: DATOS DEL EXPEDIENTE ===== -->
+    <div class="seccion-card mb-4">
+        <h6 class="seccion-card-title">
+            <i class="bi bi-journal-medical me-2"></i>Datos del Expediente
+        </h6>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Código de Expediente</label>
+                <input type="text" class="form-control bg-light text-muted fw-bold" value="@Model.Codigo" readonly disabled />
+                <small class="text-muted"><i class="bi bi-lock-fill me-1"></i>El código de expediente no se puede cambiar.</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== BOTONES ===== -->
+    <div class="seccion-card">
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-clinica">
+                <i class="bi bi-floppy-fill me-1"></i> Guardar Cambios
+            </button>
+            <a asp-action="Details" asp-route-id="@Model.ExpedienteId" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle me-1"></i> Cancelar
+            </a>
+        </div>
+    </div>
+</form>
 
 @section Scripts {
-	@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Máscara DUI: 00000000-0
+        document.getElementById('editDUI').addEventListener('input', function () {
+            let v = this.value.replace(/\D/g, '');
+            if (v.length > 9) v = v.slice(0, 9);
+            if (v.length > 8) v = v.slice(0, 8) + '-' + v.slice(8);
+            this.value = v;
+        });
+
+        // Máscara Teléfono: 0000-0000
+        document.getElementById('editTelefono').addEventListener('input', function () {
+            let v = this.value.replace(/\D/g, '');
+            if (v.length > 8) v = v.slice(0, 8);
+            if (v.length > 4) v = v.slice(0, 4) + '-' + v.slice(4);
+            this.value = v;
+        });
+    </script>
 }

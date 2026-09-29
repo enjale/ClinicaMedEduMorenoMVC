@@ -1,56 +1,433 @@
-@model ClinicaMedEduardoMorenoMVCWeb.Models.Expedientes
+@model ClinicaMedEduardoMorenoMVCWeb.Models.ViewModels.PacienteExpedienteRegistroViewModel
 
 @{
-	Layout = "_LayoutDoctor";
-	ViewData["Title"] = "Crear Expediente";
-	ViewData["Seccion"] = "Expedientes";
+    Layout = "_LayoutDoctor";
+    ViewData["Title"] = "Nuevo Expediente";
+    ViewData["Seccion"] = "Expedientes";
 }
 
-<div class="mb-3">
-	<h1>Crear Nuevo Expediente</h1>
-	<a asp-action="Index" class="text-muted small">← Volver a la lista</a>
+<!-- Encabezado -->
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h4 style="font-weight:700; color:#2F3E34; margin-bottom:0.15rem;">Crear Nuevo Expediente</h4>
+        <a asp-action="Index" style="color:#6B7280; font-size:0.9rem; text-decoration:none;">
+            ← Volver al listado
+        </a>
+    </div>
 </div>
 
-<hr />
-<div class="row">
-	<div class="col-md-6">
-		<form asp-action="Create" method="post">
-			<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<hr style="margin: 0 0 1.5rem 0;" />
 
-			<div class="form-group mb-3">
-				<label asp-for="PacienteId" class="form-label"></label>
-				<select asp-for="PacienteId" class="form-select" asp-items="ViewBag.PacienteId">
-					<option value="">-- Seleccione un paciente --</option>
-				</select>
-				<span asp-validation-for="PacienteId" class="text-danger"></span>
-			</div>
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
 
-			<div class="form-group mb-3">
-				<label asp-for="Codigo" class="form-label"></label>
-				<input asp-for="Codigo" class="form-control" placeholder="Ej. EXP-001" />
-				<span asp-validation-for="Codigo" class="text-danger"></span>
-			</div>
+<form asp-action="Create" method="post" id="formNuevoExpediente">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+    <input type="hidden" asp-for="ContactosJson" id="contactosJson" />
+    <input type="hidden" asp-for="ResponsablesJson" id="responsablesJson" />
 
-			<div class="form-group mb-3">
-				<label asp-for="Historial" class="form-label"></label>
-				<textarea asp-for="Historial" class="form-control" rows="5" placeholder="Historial médico del paciente..."></textarea>
-				<span asp-validation-for="Historial" class="text-danger"></span>
-			</div>
+    <!-- ===== SECCIÓN 1: DATOS DEL PACIENTE ===== -->
+    <div class="seccion-card mb-4">
+        <h6 class="seccion-card-title">
+            <i class="bi bi-person-fill me-2"></i>Datos del Nuevo Paciente
+        </h6>
 
-			<div class="form-group mb-3">
-				<label asp-for="FechaCreacion" class="form-label"></label>
-				<input asp-for="FechaCreacion" type="date" class="form-control" />
-				<span asp-validation-for="FechaCreacion" class="text-danger"></span>
-			</div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label asp-for="Codigo" class="form-label fw-semibold">Código del Paciente</label>
+                <input asp-for="Codigo" class="form-control" placeholder="Auto-generado si se deja vacío" />
+                <span asp-validation-for="Codigo" class="text-danger small"></span>
+                <small class="text-muted">Se generará automáticamente (PAC-XXXX) si lo deja vacío.</small>
+            </div>
+            <div class="col-md-8">
+                <label asp-for="Nombre" class="form-label fw-semibold">Nombre Completo *</label>
+                <input asp-for="Nombre" class="form-control" placeholder="Nombre completo del paciente" />
+                <span asp-validation-for="Nombre" class="text-danger small"></span>
+            </div>
 
-			<div class="form-group mt-4">
-				<button type="submit" class="btn btn-primary">Guardar</button>
-				<a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
-			</div>
-		</form>
-	</div>
-</div>
+            <div class="col-md-4">
+                <label asp-for="Sexo" class="form-label fw-semibold">Sexo *</label>
+                <select asp-for="Sexo" class="form-select">
+                    <option value="">-- Seleccione --</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                </select>
+                <span asp-validation-for="Sexo" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="FechaNac" class="form-label fw-semibold">Fecha de Nacimiento *</label>
+                <input asp-for="FechaNac" type="date" class="form-control" id="fechaNac"
+                       max="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                <span asp-validation-for="FechaNac" class="text-danger small"></span>
+                <small id="edadCalc" class="fw-semibold text-muted"></small>
+            </div>
+
+            <!-- DUI: solo visible para mayores de 18 -->
+            <div class="col-md-4" id="campoDUI">
+                <label asp-for="DUI" class="form-label fw-semibold">
+                    DUI <span class="text-danger">*</span>
+                </label>
+                <input asp-for="DUI" class="form-control" id="inputDUI" placeholder="00000000-0" />
+                <span asp-validation-for="DUI" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="Altura" class="form-label fw-semibold">Altura (m)</label>
+                <input asp-for="Altura" type="number" step="0.01" class="form-control" placeholder="Ej. 1.75" />
+                <span asp-validation-for="Altura" class="text-danger small"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Peso" class="form-label fw-semibold">Peso (kg)</label>
+                <input asp-for="Peso" type="number" step="0.1" class="form-control" placeholder="Ej. 70.5" />
+                <span asp-validation-for="Peso" class="text-danger small"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Telefono" class="form-label fw-semibold">Teléfono</label>
+                <input asp-for="Telefono" class="form-control" placeholder="Ej. 7000-0000" />
+                <span asp-validation-for="Telefono" class="text-danger small"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="Direccion" class="form-label fw-semibold">Dirección</label>
+                <input asp-for="Direccion" class="form-control" placeholder="Dirección de residencia" />
+                <span asp-validation-for="Direccion" class="text-danger small"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SECCIÓN 2: CONTACTOS DE EMERGENCIA (mayores 18+) ===== -->
+    <div class="seccion-card mb-4" id="seccionContactos" style="display:none;">
+        <h6 class="seccion-card-title">
+            <i class="bi bi-telephone-fill me-2"></i>Contactos de Emergencia
+            <span class="badge bg-secondary ms-2" style="font-size:0.7rem;">Paciente mayor de edad</span>
+        </h6>
+        <p class="text-muted small mb-3">Agregue los contactos de emergencia del paciente.</p>
+
+        <div class="row g-2 mb-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label fw-semibold small">Nombre *</label>
+                <input type="text" id="c_nombre" class="form-control form-control-sm" placeholder="Nombre del contacto" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold small">Relación *</label>
+                <input type="text" id="c_relacion" class="form-control form-control-sm" placeholder="Ej. Esposo/a" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold small">Teléfono *</label>
+                <input type="text" id="c_telefono" class="form-control form-control-sm" placeholder="0000-0000" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold small">Tel. Alterno</label>
+                <input type="text" id="c_telAlterno" class="form-control form-control-sm" placeholder="0000-0000" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold small">Dirección</label>
+                <input type="text" id="c_direccion" class="form-control form-control-sm" placeholder="Opcional" />
+            </div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-clinica btn-sm w-100" onclick="agregarContacto()" title="Agregar">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+            </div>
+        </div>
+        <div id="errorContacto" class="text-danger small mb-2" style="display:none;"></div>
+
+        <table class="tabla-interna">
+            <thead>
+                <tr>
+                    <th>Nombre</th><th>Relación</th><th>Teléfono</th><th>Tel. Alterno</th><th>Dirección</th><th style="width:50px;"></th>
+                </tr>
+            </thead>
+            <tbody id="bodyContactos">
+                <tr id="sinContactos">
+                    <td colspan="6" class="text-center text-muted fst-italic py-3">
+                        <i class="bi bi-info-circle me-1"></i>No hay contactos agregados.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ===== SECCIÓN 4: RESPONSABLES (menores de 18) ===== -->
+    <div class="seccion-card mb-4" id="seccionResponsables" style="display:none;">
+        <h6 class="seccion-card-title">
+            <i class="bi bi-people-fill me-2"></i>Responsable / Tutor Legal
+            <span class="badge bg-warning text-dark ms-2" style="font-size:0.7rem;">Paciente menor de edad</span>
+        </h6>
+        <p class="text-muted small mb-3">
+            El paciente es menor de edad — el DUI fue deshabilitado automáticamente.
+            Agregue al menos un responsable o tutor legal.
+        </p>
+
+        <div class="row g-2 mb-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label fw-semibold small">Nombre *</label>
+                <input type="text" id="r_nombre" class="form-control form-control-sm" placeholder="Nombre completo" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold small">Parentesco *</label>
+                <input type="text" id="r_parentesco" class="form-control form-control-sm" placeholder="Ej. Madre" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold small">DUI del Responsable</label>
+                <input type="text" id="r_dui" class="form-control form-control-sm" placeholder="00000000-0" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold small">Teléfono</label>
+                <input type="text" id="r_telefono" class="form-control form-control-sm" placeholder="0000-0000" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold small">Dirección</label>
+                <input type="text" id="r_direccion" class="form-control form-control-sm" placeholder="Opcional" />
+            </div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-clinica btn-sm w-100" onclick="agregarResponsable()" title="Agregar">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+            </div>
+        </div>
+        <div id="errorResponsable" class="text-danger small mb-2" style="display:none;"></div>
+        <small id="errorResponsablesJson" class="text-danger" style="display:none;">Debe agregar al menos un responsable.</small>
+
+        <table class="tabla-interna">
+            <thead>
+                <tr>
+                    <th>Nombre</th><th>Parentesco</th><th>DUI</th><th>Teléfono</th><th>Dirección</th><th style="width:50px;"></th>
+                </tr>
+            </thead>
+            <tbody id="bodyResponsables">
+                <tr id="sinResponsables">
+                    <td colspan="6" class="text-center text-muted fst-italic py-3">
+                        <i class="bi bi-info-circle me-1"></i>No hay responsables agregados.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ===== BOTONES ===== -->
+    <div class="seccion-card">
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-clinica">
+                <i class="bi bi-floppy-fill me-1"></i> Guardar Expediente
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle me-1"></i> Cancelar
+            </a>
+        </div>
+    </div>
+</form>
 
 @section Scripts {
-	@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        let contactos = [];
+        let responsables = [];
+
+        const inputFecha  = document.getElementById('fechaNac');
+        const campoDUI    = document.getElementById('campoDUI');
+        const inputDUI    = document.getElementById('inputDUI');
+        const seccionC    = document.getElementById('seccionContactos');
+        const seccionR    = document.getElementById('seccionResponsables');
+        const edadCalc    = document.getElementById('edadCalc');
+
+        function calcularEdad(fechaNac) {
+            const hoy = new Date();
+            const nac = new Date(fechaNac);
+            let edad = hoy.getFullYear() - nac.getFullYear();
+            const m = hoy.getMonth() - nac.getMonth();
+            if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) edad--;
+            return edad;
+        }
+
+        function actualizarUI() {
+            if (!inputFecha.value) { edadCalc.textContent = ''; return; }
+
+            const edad = calcularEdad(inputFecha.value);
+            edadCalc.textContent = `Edad calculada: ${edad} años`;
+
+            if (edad < 18) {
+                campoDUI.style.display = 'none';
+                inputDUI.value = '';
+                inputDUI.disabled = true;
+                seccionC.style.display = 'none';
+                seccionR.style.display = 'block';
+            } else {
+                campoDUI.style.display = '';
+                inputDUI.disabled = false;
+                seccionC.style.display = 'block';
+                seccionR.style.display = 'none';
+            }
+        }
+
+        inputFecha.addEventListener('change', actualizarUI);
+        if (inputFecha.value) actualizarUI();
+
+        // ---- CONTACTOS ----
+        function agregarContacto() {
+            const nombre    = document.getElementById('c_nombre').value.trim();
+            const relacion  = document.getElementById('c_relacion').value.trim();
+            const telefono  = document.getElementById('c_telefono').value.trim();
+            const telAlt    = document.getElementById('c_telAlterno').value.trim();
+            const dir       = document.getElementById('c_direccion').value.trim();
+            const err       = document.getElementById('errorContacto');
+
+            if (!nombre || !relacion || !telefono) {
+                err.textContent = 'Nombre, relación y teléfono son obligatorios.';
+                err.style.display = '';
+                return;
+            }
+            err.style.display = 'none';
+
+            contactos.push({ Nombre: nombre, Relacion: relacion, Telefono: telefono,
+                             TelefonoAlterno: telAlt, Direccion: dir, Prioridad: contactos.length + 1 });
+            renderContactos();
+            document.getElementById('contactosJson').value = JSON.stringify(contactos);
+            ['c_nombre','c_relacion','c_telefono','c_telAlterno','c_direccion'].forEach(id => document.getElementById(id).value = '');
+        }
+
+        function eliminarContacto(i) {
+            contactos.splice(i, 1);
+            contactos.forEach((c, idx) => c.Prioridad = idx + 1);
+            renderContactos();
+            document.getElementById('contactosJson').value = JSON.stringify(contactos);
+        }
+
+        function renderContactos() {
+            const tb = document.getElementById('bodyContactos');
+            if (contactos.length === 0) {
+                tb.innerHTML = '<tr id="sinContactos"><td colspan="6" class="text-center text-muted fst-italic py-3"><i class="bi bi-info-circle me-1"></i>No hay contactos agregados.</td></tr>';
+                return;
+            }
+            tb.innerHTML = contactos.map((c, i) => `
+                <tr>
+                    <td>${esc(c.Nombre)}</td><td>${esc(c.Relacion)}</td>
+                    <td>${esc(c.Telefono)}</td><td>${esc(c.TelefonoAlterno)}</td>
+                    <td>${esc(c.Direccion)}</td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-danger btn-sm py-0 px-2" onclick="eliminarContacto(${i})">
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                    </td>
+                </tr>`).join('');
+        }
+
+        // ---- RESPONSABLES ----
+        function agregarResponsable() {
+            const nombre     = document.getElementById('r_nombre').value.trim();
+            const parentesco = document.getElementById('r_parentesco').value.trim();
+            const dui        = document.getElementById('r_dui').value.trim();
+            const telefono   = document.getElementById('r_telefono').value.trim();
+            const dir        = document.getElementById('r_direccion').value.trim();
+            const err        = document.getElementById('errorResponsable');
+
+            if (!nombre || !parentesco) {
+                err.textContent = 'Nombre y parentesco son obligatorios.';
+                err.style.display = '';
+                return;
+            }
+            err.style.display = 'none';
+
+            responsables.push({ Nombre: nombre, Parentesco: parentesco,
+                                DUI: dui || null, Telefono: telefono || null, Direccion: dir || null });
+            renderResponsables();
+            document.getElementById('responsablesJson').value = JSON.stringify(responsables);
+            ['r_nombre','r_parentesco','r_dui','r_telefono','r_direccion'].forEach(id => document.getElementById(id).value = '');
+        }
+
+        function eliminarResponsable(i) {
+            responsables.splice(i, 1);
+            renderResponsables();
+            document.getElementById('responsablesJson').value = JSON.stringify(responsables);
+        }
+
+        function renderResponsables() {
+            const tb = document.getElementById('bodyResponsables');
+            if (responsables.length === 0) {
+                tb.innerHTML = '<tr id="sinResponsables"><td colspan="6" class="text-center text-muted fst-italic py-3"><i class="bi bi-info-circle me-1"></i>No hay responsables agregados.</td></tr>';
+                return;
+            }
+            tb.innerHTML = responsables.map((r, i) => `
+                <tr>
+                    <td>${esc(r.Nombre)}</td><td>${esc(r.Parentesco)}</td>
+                    <td>${esc(r.DUI ?? '-')}</td><td>${esc(r.Telefono ?? '-')}</td>
+                    <td>${esc(r.Direccion ?? '-')}</td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-danger btn-sm py-0 px-2" onclick="eliminarResponsable(${i})">
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                    </td>
+                </tr>`).join('');
+        }
+
+        // ---- VALIDACIÓN SUBMIT ----
+        document.getElementById('formNuevoExpediente').addEventListener('submit', function(e) {
+            if (!inputFecha.value) return;
+            const edad = calcularEdad(inputFecha.value);
+            if (edad < 18 && responsables.length === 0) {
+                e.preventDefault();
+                document.getElementById('errorResponsablesJson').style.display = '';
+                seccionR.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+        function esc(s) {
+            return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
+        }
+
+        // ---- MÁSCARAS DUI y TELÉFONO ----
+        function aplicarMascaraDUI(input) {
+            input.addEventListener('input', function () {
+                let v = this.value.replace(/\D/g, '');          // solo dígitos
+                if (v.length > 9) v = v.slice(0, 9);            // máx 9 dígitos
+                if (v.length > 8) v = v.slice(0, 8) + '-' + v.slice(8);  // guion en posición 9
+                this.value = v;
+            });
+            input.setAttribute('maxlength', '10');
+            input.setAttribute('placeholder', '00000000-0');
+        }
+
+        function aplicarMascaraTelefono(input) {
+            input.addEventListener('input', function () {
+                let v = this.value.replace(/\D/g, '');           // solo dígitos
+                if (v.length > 8) v = v.slice(0, 8);             // máx 8 dígitos
+                if (v.length > 4) v = v.slice(0, 4) + '-' + v.slice(4);  // guion en posición 5
+                this.value = v;
+            });
+            input.setAttribute('maxlength', '9');
+            input.setAttribute('placeholder', '0000-0000');
+        }
+
+        // Aplicar al cargar la página
+        document.addEventListener('DOMContentLoaded', function () {
+            // DUI del paciente
+            const duiInput = document.getElementById('inputDUI');
+            if (duiInput) aplicarMascaraDUI(duiInput);
+
+            // DUI del responsable en el formulario inline
+            const rDui = document.getElementById('r_dui');
+            if (rDui) aplicarMascaraDUI(rDui);
+
+            // Teléfonos
+            const telPaciente = document.getElementById('Telefono');
+            if (telPaciente) aplicarMascaraTelefono(telPaciente);
+
+            const cTel    = document.getElementById('c_telefono');
+            if (cTel) aplicarMascaraTelefono(cTel);
+
+            const cTelAlt = document.getElementById('c_telAlterno');
+            if (cTelAlt) aplicarMascaraTelefono(cTelAlt);
+
+            const rTel    = document.getElementById('r_telefono');
+            if (rTel) aplicarMascaraTelefono(rTel);
+        });
+    </script>
 }

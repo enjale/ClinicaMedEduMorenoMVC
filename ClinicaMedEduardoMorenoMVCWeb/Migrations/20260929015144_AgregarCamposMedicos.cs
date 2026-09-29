@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -11,9 +11,6 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_RecetaDetalles",
-                table: "RecetaDetalles");
 
             migrationBuilder.DropColumn(
                 name: "Diagnostico",
@@ -22,10 +19,6 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Migrations
             migrationBuilder.DropColumn(
                 name: "Grado",
                 table: "Alergias");
-
-            migrationBuilder.RenameTable(
-                name: "RecetaDetalles",
-                newName: "RecetaDetalle");
 
             migrationBuilder.RenameColumn(
                 name: "Descripcion",
@@ -151,10 +144,6 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Migrations
                 type: "int",
                 nullable: true);
 
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_RecetaDetalle",
-                table: "RecetaDetalle",
-                column: "RecetaDetalleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Expedientes_PacienteId",
@@ -285,10 +274,6 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Migrations
                 name: "IX_Antecedentes_ExpedienteId",
                 table: "Antecedentes");
 
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_RecetaDetalle",
-                table: "RecetaDetalle");
-
             migrationBuilder.DropColumn(
                 name: "VitalPresion",
                 table: "Consultas");
@@ -301,9 +286,6 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Migrations
                 name: "ExpedienteId",
                 table: "Antecedentes");
 
-            migrationBuilder.RenameTable(
-                name: "RecetaDetalle",
-                newName: "RecetaDetalles");
 
             migrationBuilder.RenameColumn(
                 name: "Codigo",
@@ -439,11 +421,6 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Migrations
                 maxLength: 50,
                 nullable: false,
                 defaultValue: "");
-
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_RecetaDetalles",
-                table: "RecetaDetalles",
-                column: "RecetaDetalleId");
         }
     }
 }

@@ -1,77 +1,104 @@
 @model ClinicaMedEduardoMorenoMVCWeb.Models.Pacientes
 
 @{
-    ViewData["Title"] = "Edit";
+    Layout = "_LayoutDoctor";
+    ViewData["Title"] = "Editar Paciente";
+    ViewData["Seccion"] = "Pacientes";
 }
 
-<h1>Edit</h1>
-
-<h4>Pacientes</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="PacienteId" />
-            <div class="form-group">
-                <label asp-for="Codigo" class="control-label"></label>
-                <input asp-for="Codigo" class="form-control" />
-                <span asp-validation-for="Codigo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Nombre" class="control-label"></label>
-                <input asp-for="Nombre" class="form-control" />
-                <span asp-validation-for="Nombre" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Sexo" class="control-label"></label>
-                <input asp-for="Sexo" class="form-control" />
-                <span asp-validation-for="Sexo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FechaNac" class="control-label"></label>
-                <input asp-for="FechaNac" class="form-control" />
-                <span asp-validation-for="FechaNac" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DUI" class="control-label"></label>
-                <input asp-for="DUI" class="form-control" />
-                <span asp-validation-for="DUI" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Altura" class="control-label"></label>
-                <input asp-for="Altura" class="form-control" />
-                <span asp-validation-for="Altura" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Peso" class="control-label"></label>
-                <input asp-for="Peso" class="form-control" />
-                <span asp-validation-for="Peso" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Telefono" class="control-label"></label>
-                <input asp-for="Telefono" class="form-control" />
-                <span asp-validation-for="Telefono" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Direccion" class="control-label"></label>
-                <input asp-for="Direccion" class="form-control" />
-                <span asp-validation-for="Direccion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreadoEn" class="control-label"></label>
-                <input asp-for="CreadoEn" class="form-control" />
-                <span asp-validation-for="CreadoEn" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+<!-- Encabezado -->
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h4 style="font-weight:700; color:#2F3E34; margin-bottom:0.15rem;">Editar Paciente</h4>
+        <a asp-action="Index" style="color:#6B7280; font-size:0.9rem; text-decoration:none;">
+            ← Volver al listado
+        </a>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+<hr style="margin: 0 0 1.5rem 0;" />
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="seccion-card">
+            <form asp-action="Edit" asp-route-pacienteid="@Model.PacienteId" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <input type="hidden" asp-for="PacienteId" />
+
+                <div class="row g-3">
+                    <!-- Código y Nombre -->
+                    <div class="col-md-4">
+                        <label asp-for="Codigo" class="form-label fw-semibold">Código *</label>
+                        <input asp-for="Codigo" class="form-control" />
+                        <span asp-validation-for="Codigo" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-8">
+                        <label asp-for="Nombre" class="form-label fw-semibold">Nombre Completo *</label>
+                        <input asp-for="Nombre" class="form-control" />
+                        <span asp-validation-for="Nombre" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Sexo y Fecha de Nacimiento -->
+                    <div class="col-md-4">
+                        <label asp-for="Sexo" class="form-label fw-semibold">Sexo *</label>
+                        <select asp-for="Sexo" class="form-select">
+                            <option value="">-- Seleccione --</option>
+                            <option value="M">Masculino</option>
+                            <option value="F">Femenino</option>
+                        </select>
+                        <span asp-validation-for="Sexo" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="FechaNac" class="form-label fw-semibold">Fecha de Nacimiento</label>
+                        <input asp-for="FechaNac" type="date" class="form-control" />
+                        <span asp-validation-for="FechaNac" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="DUI" class="form-label fw-semibold">DUI</label>
+                        <input asp-for="DUI" class="form-control" />
+                        <span asp-validation-for="DUI" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Altura, Peso y Teléfono -->
+                    <div class="col-md-4">
+                        <label asp-for="Altura" class="form-label fw-semibold">Altura (m)</label>
+                        <input asp-for="Altura" type="number" step="0.01" class="form-control" />
+                        <span asp-validation-for="Altura" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Peso" class="form-label fw-semibold">Peso</label>
+                        <input asp-for="Peso" type="number" step="0.01" class="form-control" />
+                        <span asp-validation-for="Peso" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Telefono" class="form-label fw-semibold">Teléfono</label>
+                        <input asp-for="Telefono" class="form-control" />
+                        <span asp-validation-for="Telefono" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Dirección -->
+                    <div class="col-12">
+                        <label asp-for="Direccion" class="form-label fw-semibold">Dirección</label>
+                        <input asp-for="Direccion" class="form-control" />
+                        <span asp-validation-for="Direccion" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Fecha de Registro -->
+                    <div class="col-md-4">
+                        <label asp-for="CreadoEn" class="form-label fw-semibold">Fecha de Registro *</label>
+                        <input asp-for="CreadoEn" type="date" class="form-control" />
+                        <span asp-validation-for="CreadoEn" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-4 pt-3 border-top">
+                    <button type="submit" class="btn btn-clinica">Guardar Cambios</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 @section Scripts {

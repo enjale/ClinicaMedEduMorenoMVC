@@ -1,98 +1,56 @@
 @model ClinicaMedEduardoMorenoMVCWeb.Models.Pacientes
 
 @{
-    ViewData["Title"] = "Delete";
+    Layout = "_LayoutDoctor";
+    ViewData["Title"] = "Eliminar Paciente";
+    ViewData["Seccion"] = "Pacientes";
 }
 
-<h1>Delete</h1>
+<!-- Encabezado -->
+<div class="mb-3">
+    <h4 style="font-weight:700; color:#2F3E34; margin-bottom:0.15rem;">Eliminar Paciente</h4>
+    <a asp-action="Index" style="color:#6B7280; font-size:0.9rem; text-decoration:none;">
+        ← Volver al listado
+    </a>
+</div>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>ClinicaMedEduardoMorenoMVCWeb.Models.Pacientes</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Codigo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Codigo)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nombre)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nombre)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Sexo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Sexo)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaNac)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaNac)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DUI)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DUI)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Altura)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Altura)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Peso)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Peso)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Telefono)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Telefono)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Direccion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Direccion)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreadoEn)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreadoEn)
-        </dd>
-    </dl>
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="PacienteId" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+<hr style="margin: 0 0 1.5rem 0;" />
+
+<div class="alert alert-danger" role="alert" style="max-width: 700px;">
+    <strong>¿Está seguro de que desea eliminar este paciente?</strong> Esta acción no se puede deshacer y podría afectar expedientes y consultas relacionadas.
+</div>
+
+<div class="row">
+    <div class="col-lg-7">
+        <div class="seccion-card">
+            <dl class="row mb-4">
+                <dt class="col-sm-4 text-muted">Código</dt>
+                <dd class="col-sm-8 fw-semibold" style="color: #4F6F52;">@Model.Codigo</dd>
+
+                <dt class="col-sm-4 text-muted">Nombre</dt>
+                <dd class="col-sm-8 fw-semibold">@Model.Nombre</dd>
+
+                <dt class="col-sm-4 text-muted">Sexo</dt>
+                <dd class="col-sm-8">@(Model.Sexo == "M" ? "Masculino" : Model.Sexo == "F" ? "Femenino" : Model.Sexo)</dd>
+
+                <dt class="col-sm-4 text-muted">Fecha Nacimiento</dt>
+                <dd class="col-sm-8">@(Model.FechaNac?.ToString("dd/MM/yyyy") ?? "—")</dd>
+
+                <dt class="col-sm-4 text-muted">DUI</dt>
+                <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.DUI) ? "—" : Model.DUI)</dd>
+
+                <dt class="col-sm-4 text-muted">Teléfono</dt>
+                <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.Telefono) ? "—" : Model.Telefono)</dd>
+            </dl>
+
+            <form asp-action="Delete" asp-route-pacienteid="@Model.PacienteId" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="PacienteId" />
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-peligro">Confirmar Eliminación</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>

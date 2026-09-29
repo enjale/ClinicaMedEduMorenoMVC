@@ -8,9 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // Registrar el contexto de base de datos
-builder.Services.AddDbContext(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning)));
+builder.Services.AddDbContext<ClinicaMedEduardoMorenoMVCWeb.Data.AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+    .ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning)));
 
 // Configuración del servicio de correo con MailKit
 builder.Services.Configure<ClinicaMedEduardoMorenoMVCWeb.Models.EmailSettings>(
@@ -67,6 +67,14 @@ app.Run();
 static void ApplyMigrations(WebApplication application)
 {
     using var scope = application.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService();
-    db.Database.Migrate();
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ClinicaMedEduardoMorenoMVCWeb.Data.AppDbContext>();
+        db.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetService<ILogger<Program>>();
+        logger?.LogError(ex, "Ocurrió un error al aplicar las migraciones de EF Core.");
+    }
 }

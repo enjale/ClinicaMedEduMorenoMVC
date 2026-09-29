@@ -10,18 +10,18 @@
 <!-- Encabezado -->
 <div class="d-flex justify-content-between align-items-start mb-3">
 	<div>
-		<h4 style="font-weight:700; color:#2F3E34; margin-bottom:0.15rem;">Agregar Antecedente Médico</h4>
+		<h4 class="seccion-h4 mb-1">Agregar Antecedente Médico</h4>
 		@if (expedienteId.HasValue)
 		{
 			<a href="@Url.Action("Details", "Expedientes", new { id = expedienteId, tab = "antecedentes" })"
-			   style="color:#6B7280; font-size:0.9rem; text-decoration:none;">
+			   class="text-muted small">
 				← Volver al expediente
 			</a>
 		}
 	</div>
 </div>
 
-<hr style="margin: 0 0 1.5rem 0;" />
+<hr class="mb-4" />
 
 <div class="row">
 	<div class="col-md-6">
@@ -68,13 +68,13 @@
 					@if (expedienteId.HasValue)
 					{
 						<a href="@Url.Action("Details", "Expedientes", new { id = expedienteId, tab = "antecedentes" })"
-						   class="btn" style="border:1.5px solid #ccc; color:#374151; font-weight:600; border-radius:4px; padding:0.4rem 1.1rem;">
+						   class="btn btn-outline-secondary">
 							Cancelar
 						</a>
 					}
 					else
 					{
-						<a asp-action="Index" class="btn" style="border:1.5px solid #ccc; color:#374151; font-weight:600; border-radius:4px; padding:0.4rem 1.1rem;">
+						<a asp-action="Index" class="btn btn-outline-secondary">
 							Cancelar
 						</a>
 					}
@@ -83,27 +83,6 @@
 		</div>
 	</div>
 </div>
-
-<style>
-	.seccion-card {
-		background: #fff;
-		border: 1px solid #e0e0e0;
-		border-radius: 8px;
-		padding: 1.5rem;
-	}
-	.btn-clinica {
-		background: #4F6F52 !important;
-		color: white !important;
-		font-weight: 600;
-		border-radius: 4px;
-		padding: 0.4rem 1.1rem;
-		border: none;
-	}
-	.btn-clinica:hover {
-		background: #3A5240 !important;
-		color: white !important;
-	}
-</style>
 
 @section Scripts {
 	@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

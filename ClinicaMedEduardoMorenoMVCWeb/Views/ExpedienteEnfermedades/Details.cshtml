@@ -2,36 +2,49 @@
 
 @{
     Layout = "_LayoutDoctor";
-    ViewData["Title"] = "Detalles de Expediente de Enfermedad";
-    ViewData["Seccion"] = "Expediente de Enfermedades";
+    ViewData["Title"] = "Detalle de Enfermedad";
+    ViewData["Seccion"] = "Expedientes Clínicos";
 }
 
-<div class="mb-3">
-    <h1>Detalles de Expediente de Enfermedad</h1>
-    <a asp-action="Index" class="text-muted small">← Volver a la lista</a>
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h4 class="seccion-h4 mb-1">Detalle de Enfermedad en Expediente</h4>
+        <a href="@Url.Action("Details", "Expedientes", new { id = Model.ExpedienteId, tab = "alergias" })"
+           class="text-muted small">
+            ← Volver al expediente
+        </a>
+    </div>
 </div>
 
-<hr />
+<hr class="mb-4" />
+
 <div class="row">
     <div class="col-md-6">
-        <dl class="row">
-            <dt class="col-sm-4">Expediente</dt>
-            <dd class="col-sm-8">@(Model.Expediente?.Codigo ?? Model.ExpedienteId.ToString())</dd>
+        <div class="seccion-card">
+            <h5 class="seccion-titulo">Información de la Enfermedad</h5>
+            <dl class="row mb-0">
+                <dt class="col-sm-4 campo-label">Expediente</dt>
+                <dd class="col-sm-8">@(Model.Expediente?.Codigo ?? Model.ExpedienteId.ToString())</dd>
 
-            <dt class="col-sm-4">Enfermedad</dt>
-            <dd class="col-sm-8">@(Model.Enfermedad?.Nombre ?? Model.EnfermedadId.ToString())</dd>
+                <dt class="col-sm-4 campo-label">Enfermedad</dt>
+                <dd class="col-sm-8 fw-semibold" style="color:#2F3E34;">@(Model.Enfermedad?.Nombre ?? Model.EnfermedadId.ToString())</dd>
 
-            <dt class="col-sm-4">Fecha Detección</dt>
-            <dd class="col-sm-8">@(Model.FechaDeteccion?.ToString("dd/MM/yyyy") ?? "—")</dd>
+                <dt class="col-sm-4 campo-label">Fecha Detección</dt>
+                <dd class="col-sm-8">@(Model.FechaDeteccion?.ToString("dd/MM/yyyy") ?? "—")</dd>
 
-            <dt class="col-sm-4">Observaciones</dt>
-            <dd class="col-sm-8">@Html.DisplayFor(model => model.Observaciones)</dd>
-        </dl>
+                <dt class="col-sm-4 campo-label">Observaciones</dt>
+                <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.Observaciones) ? "—" : Model.Observaciones)</dd>
+            </dl>
+        </div>
 
-        <div class="mt-4">
-            <a asp-action="Edit" asp-route-id="@Model.ExpedienteEnfermedadId" class="btn btn-primary">Editar</a>
-            <a asp-action="Delete" asp-route-id="@Model.ExpedienteEnfermedadId" class="btn btn-danger ms-2">Eliminar</a>
-            <a asp-action="Index" class="btn btn-secondary ms-2">Volver a la lista</a>
+        <div class="d-flex gap-2 mt-3">
+            <a asp-action="Edit" asp-route-id="@Model.ExpedienteEnfermedadId" class="btn btn-clinica">
+                Editar
+            </a>
+            <a href="@Url.Action("Details", "Expedientes", new { id = Model.ExpedienteId, tab = "alergias" })"
+               class="btn btn-outline-secondary">
+                Volver al Expediente
+            </a>
         </div>
     </div>
 </div>

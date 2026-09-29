@@ -9,6 +9,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Models.ViewModels
         public List<ExpedienteAlergias> Alergias { get; set; } = new();
         public List<ExpedienteEnfermedades> Enfermedades { get; set; } = new();
         public List<Antecedentes> Antecedentes { get; set; } = new();
+        public List<Consultas> Consultas { get; set; } = new();
         public string TabActiva { get; set; } = "alergias";
     }
 }

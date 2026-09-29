@@ -1,89 +1,72 @@
 @model IEnumerable<ClinicaMedEduardoMorenoMVCWeb.Models.Pacientes>
 
 @{
-    ViewData["Title"] = "Index";
+    Layout = "_LayoutDoctor";
+    ViewData["Title"] = "Pacientes";
+    ViewData["Seccion"] = "Pacientes";
 }
 
-<h1>Index</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h4 style="font-weight:700; color:#2F3E34; margin:0;">Listado de Pacientes</h4>
+        <small class="text-muted">Registro y administración de información de pacientes</small>
+    </div>
+    <a asp-action="Create" class="btn btn-clinica">+ Nuevo Paciente</a>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Codigo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Nombre)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sexo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FechaNac)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DUI)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Altura)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Peso)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Telefono)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Direccion)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreadoEn)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(model => item.Codigo)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Nombre)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Sexo)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.FechaNac)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.DUI)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Altura)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Peso)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Telefono)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Direccion)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.CreadoEn)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.PacienteId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.PacienteId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.PacienteId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="tabla-wrap">
+    <table class="tabla-interna">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Sexo</th>
+                <th>F. Nacimiento</th>
+                <th>DUI</th>
+                <th>Teléfono</th>
+                <th class="text-end">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="7" class="tabla-vacia">No hay pacientes registrados.</td>
+                </tr>
+            }
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td style="color:#4F6F52; font-weight:600;">@item.Codigo</td>
+                    <td style="font-weight:600;">@item.Nombre</td>
+                    <td>
+                        @if (item.Sexo == "M")
+                        {
+                            <span class="badge bg-light text-dark border">Masculino</span>
+                        }
+                        else if (item.Sexo == "F")
+                        {
+                            <span class="badge bg-light text-dark border">Femenino</span>
+                        }
+                        else
+                        {
+                            <span>@item.Sexo</span>
+                        }
+                    </td>
+                    <td>@(item.FechaNac?.ToString("dd/MM/yyyy") ?? "—")</td>
+                    <td>@(string.IsNullOrEmpty(item.DUI) ? "—" : item.DUI)</td>
+                    <td>@(string.IsNullOrEmpty(item.Telefono) ? "—" : item.Telefono)</td>
+                    <td class="text-end">
+                        <a asp-action="Details" asp-route-pacienteid="@item.PacienteId" class="btn btn-sm btn-clinica me-1">Detalles</a>
+                        <a asp-action="Edit" asp-route-pacienteid="@item.PacienteId" class="btn btn-sm btn-outline-secondary me-1">Editar</a>
+                        <a asp-action="Delete" asp-route-pacienteid="@item.PacienteId" class="btn btn-sm btn-peligro">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="mt-3 text-muted small">
+    @Model.Count() paciente(s) registrado(s)
+</div>

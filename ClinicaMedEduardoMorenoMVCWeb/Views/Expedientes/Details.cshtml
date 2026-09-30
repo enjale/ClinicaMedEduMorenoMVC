@@ -167,7 +167,7 @@
 									<input type="hidden" name="id" value="@a.ExpedienteAlergiaId" />
 									<input type="hidden" name="expedienteId" value="@Model.Expediente.ExpedienteId" />
 									<button type="submit" class="btn btn-sm btn-peligro"
-											onclick="return confirm('¿Eliminar esta alergia?')">
+											data-confirmar="¿Eliminar esta alergia?">
 										Eliminar
 									</button>
 								</form>
@@ -219,7 +219,7 @@
 									<input type="hidden" name="id" value="@e.ExpedienteEnfermedadId" />
 									<input type="hidden" name="expedienteId" value="@Model.Expediente.ExpedienteId" />
 									<button type="submit" class="btn btn-sm btn-peligro"
-											onclick="return confirm('¿Eliminar esta enfermedad?')">
+											data-confirmar="¿Eliminar esta enfermedad?">
 										Eliminar
 									</button>
 								</form>
@@ -279,7 +279,7 @@
 								<input type="hidden" name="id" value="@ant.AntecedentesId" />
 								<input type="hidden" name="expedienteId" value="@Model.Expediente.ExpedienteId" />
 								<button type="submit" class="btn btn-sm btn-peligro"
-										onclick="return confirm('¿Eliminar este antecedente?')">
+										data-confirmar="¿Eliminar este antecedente?">
 									Eliminar
 								</button>
 							</form>

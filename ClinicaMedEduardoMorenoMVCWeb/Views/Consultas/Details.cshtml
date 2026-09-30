@@ -163,7 +163,7 @@
                                                 Editar
                                             </button>
                                             <form asp-action="QuitarEnfermedad" asp-route-id="@item.ConsultaEnfermedadId" method="post" class="d-inline"
-                                                  onsubmit="return confirm('¿Está seguro de que desea eliminar esta enfermedad del diagnóstico?');">
+                                                  data-confirmar="¿Está seguro de que desea eliminar esta enfermedad del diagnóstico?">
                                                 <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
                                             </form>
                                         </td>
@@ -238,7 +238,7 @@
                                                 Editar
                                             </button>
                                             <form asp-action="QuitarMedicamento" asp-route-id="@med.RecetaDetalleId" method="post" class="d-inline"
-                                                  onsubmit="return confirm('¿Está seguro de que desea eliminar este medicamento?');">
+                                                  data-confirmar="¿Está seguro de que desea eliminar este medicamento?">
                                                 <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
                                             </form>
                                         </td>

@@ -51,13 +51,23 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
             return $"ANT-{siguienteNumero:D3}";
         }
 
+        // La columna Fecha es NOT NULL en la BD: sin fecha, el INSERT/UPDATE fallaría
+        private void ValidarFecha(Antecedentes antecedente)
+        {
+            if (!antecedente.Fecha.HasValue)
+            {
+                ModelState.AddModelError(nameof(antecedente.Fecha), "La fecha es obligatoria.");
+            }
+        }
+
         // GET: Antecedentes/Create?expedienteId=5
         public IActionResult Create(int? expedienteId)
         {
             ViewBag.ExpedienteIdActual = expedienteId;
-            return View(new Antecedentes { 
+            return View(new Antecedentes {
                 ExpedienteId = expedienteId,
-                Codigo = GenerarSiguienteCodigo()
+                Codigo = GenerarSiguienteCodigo(),
+                Fecha = DateTime.Today
             });
         }
 
@@ -68,6 +78,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
         {
             antecedente.Codigo = GenerarSiguienteCodigo();
             ModelState.Remove(nameof(antecedente.Codigo));
+            ValidarFecha(antecedente);
 
             if (ModelState.IsValid)
             {
@@ -109,6 +120,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
                 antecedente.Codigo = antExistente?.Codigo ?? GenerarSiguienteCodigo();
             }
             ModelState.Remove(nameof(antecedente.Codigo));
+            ValidarFecha(antecedente);
 
             if (ModelState.IsValid)
             {

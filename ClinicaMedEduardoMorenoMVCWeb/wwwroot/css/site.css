@@ -765,3 +765,31 @@ a:hover {
     color: var(--color-texto-subtitulo);
     font-weight: 600;
 }
+/* ==========================================================================
+   MODAL DE CONFIRMACIÓN (reemplaza el confirm() del navegador)
+   ========================================================================== */
+.modal-confirmar {
+    border: 1px solid var(--color-borde);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(47, 62, 52, 0.18);
+}
+
+.modal-confirmar-icono {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #fbeeea;
+    color: #b54834;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-confirmar-titulo {
+    font-weight: 700;
+    color: var(--color-texto-titulo);
+}
+
+.modal-confirmar-mensaje {
+    color: var(--color-texto-subtitulo);
+}

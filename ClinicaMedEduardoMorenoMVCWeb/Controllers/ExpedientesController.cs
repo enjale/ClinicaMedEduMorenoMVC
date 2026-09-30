@@ -93,7 +93,29 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
         // GET: Expedientes/Create — Registro unificado nuevo paciente
         public IActionResult Create()
         {
-            return View(new PacienteExpedienteRegistroViewModel());
+            return View(new PacienteExpedienteRegistroViewModel
+            {
+                Codigo = GenerarSiguienteCodigoPaciente()
+            });
+        }
+
+        // Código correlativo del paciente (PAC-###) a partir del número más alto registrado
+        private string GenerarSiguienteCodigoPaciente()
+        {
+            var codigos = _context.Pacientes.Select(p => p.Codigo).ToList();
+            int maxNumero = 0;
+
+            foreach (var cod in codigos)
+            {
+                if (string.IsNullOrWhiteSpace(cod)) continue;
+                var match = System.Text.RegularExpressions.Regex.Match(cod, @"\d+");
+                if (match.Success && int.TryParse(match.Value, out int num))
+                {
+                    if (num > maxNumero) maxNumero = num;
+                }
+            }
+
+            return $"PAC-{maxNumero + 1:D3}";
         }
 
         // POST: Expedientes/Create
@@ -122,12 +144,9 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
                     ModelState.AddModelError("ResponsablesJson", "Debe agregar al menos un responsable para pacientes menores de edad.");
             }
 
-            // Generar código automático si viene vacío
-            if (string.IsNullOrWhiteSpace(vm.Codigo))
-            {
-                var total = await _context.Pacientes.CountAsync();
-                vm.Codigo = $"PAC-{(total + 1):D4}";
-            }
+            // El código siempre lo asigna el sistema (no se acepta el valor enviado por el formulario)
+            vm.Codigo = GenerarSiguienteCodigoPaciente();
+            ModelState.Remove(nameof(vm.Codigo));
 
             if (!ModelState.IsValid)
                 return View(vm);

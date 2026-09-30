@@ -32,18 +32,43 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
             return View(antecedente);
         }
 
+        private string GenerarSiguienteCodigo()
+        {
+            var codigos = _context.Antecedentes.Select(a => a.Codigo).ToList();
+            int maxNumero = 0;
+
+            foreach (var cod in codigos)
+            {
+                if (string.IsNullOrWhiteSpace(cod)) continue;
+                var match = System.Text.RegularExpressions.Regex.Match(cod, @"\d+");
+                if (match.Success && int.TryParse(match.Value, out int num))
+                {
+                    if (num > maxNumero) maxNumero = num;
+                }
+            }
+
+            int siguienteNumero = maxNumero + 1;
+            return $"ANT-{siguienteNumero:D3}";
+        }
+
         // GET: Antecedentes/Create?expedienteId=5
         public IActionResult Create(int? expedienteId)
         {
             ViewBag.ExpedienteIdActual = expedienteId;
-            return View(new Antecedentes { ExpedienteId = expedienteId });
+            return View(new Antecedentes { 
+                ExpedienteId = expedienteId,
+                Codigo = GenerarSiguienteCodigo()
+            });
         }
 
         // POST: Antecedentes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AntecedentesId,Tipo,Descripcion,Fecha,ExpedienteId")] Antecedentes antecedente)
+        public async Task<IActionResult> Create([Bind("AntecedentesId,Codigo,Tipo,Descripcion,Fecha,ExpedienteId")] Antecedentes antecedente)
         {
+            antecedente.Codigo = GenerarSiguienteCodigo();
+            ModelState.Remove(nameof(antecedente.Codigo));
+
             if (ModelState.IsValid)
             {
                 _context.Add(antecedente);
@@ -74,9 +99,16 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
         // POST: Antecedentes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AntecedentesId,Tipo,Descripcion,Fecha,ExpedienteId")] Antecedentes antecedente)
+        public async Task<IActionResult> Edit(int id, [Bind("AntecedentesId,Codigo,Tipo,Descripcion,Fecha,ExpedienteId")] Antecedentes antecedente)
         {
             if (id != antecedente.AntecedentesId) return NotFound();
+
+            if (string.IsNullOrWhiteSpace(antecedente.Codigo))
+            {
+                var antExistente = await _context.Antecedentes.AsNoTracking().FirstOrDefaultAsync(a => a.AntecedentesId == id);
+                antecedente.Codigo = antExistente?.Codigo ?? GenerarSiguienteCodigo();
+            }
+            ModelState.Remove(nameof(antecedente.Codigo));
 
             if (ModelState.IsValid)
             {

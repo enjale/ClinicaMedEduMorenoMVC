@@ -78,9 +78,9 @@
         {
             <!-- La enfermera registra consultas en estado pendiente (en espera del doctor) -->
             <input type="hidden" asp-for="Estado" value="pendiente" />
-            <div class="form-control bg-light d-flex align-items-center justify-content-between" style="cursor: not-allowed;">
-                <span class="fw-semibold text-warning-emphasis">Pendiente</span>
-                <span class="badge bg-warning text-dark">En espera de atención médica</span>
+            <div class="form-control bg-light d-flex align-items-center gap-2" style="cursor: not-allowed; min-height: 38px; height: auto;">
+                <span class="badge bg-warning text-dark flex-shrink-0">Pendiente</span>
+                <span class="text-muted small text-truncate" title="En espera de atención médica">En espera de atención médica</span>
             </div>
             <small class="text-muted d-block mt-1">El estado pasará a atendido cuando el médico realice la consulta.</small>
         }

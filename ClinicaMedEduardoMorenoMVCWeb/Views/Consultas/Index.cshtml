@@ -71,10 +71,6 @@
             <div class="col-auto">
                 <a asp-action="Index" class="btn btn-outline-secondary">Limpiar</a>
             </div>
-            <div class="col-auto">
-                <a asp-action="Index" asp-route-buscar="@buscar" asp-route-filtro="@filtro" asp-route-pagina="@ViewBag.PaginaActual"
-                   class="btn btn-outline-secondary">⟳ Actualizar</a>
-            </div>
         </div>
     </form>
 
@@ -146,7 +142,7 @@
                                     <!-- Vista completa para Doctor -->
                                     @if (item.Estado == "atendida")
                                     {
-                                        <a asp-action="Edit" asp-route-id="@item.ConsultaId" class="btn btn-sm btn-outline-primary me-1">Editar</a>
+                                        <a asp-action="Details" asp-route-id="@item.ConsultaId" class="btn btn-sm btn-outline-primary me-1">Editar</a>
                                         <button type="button" class="btn btn-sm btn-outline-secondary me-1" title="Imprimir (Próximamente)" disabled>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
                                                 <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1" />
@@ -158,7 +154,6 @@
                                     else
                                     {
                                         <a asp-action="Details" asp-route-id="@item.ConsultaId" class="btn btn-sm btn-outline-secondary me-1">Atender</a>
-                                        <a asp-action="Edit" asp-route-id="@item.ConsultaId" class="btn btn-sm btn-outline-primary me-1">Editar</a>
                                     }
                                     <a asp-action="Delete" asp-route-id="@item.ConsultaId" class="btn btn-sm btn-outline-danger">Eliminar</a>
                                 }

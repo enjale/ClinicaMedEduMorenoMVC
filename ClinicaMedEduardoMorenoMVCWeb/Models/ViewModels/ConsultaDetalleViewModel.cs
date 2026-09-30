@@ -27,6 +27,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Models.ViewModels
     public class RecetaMedicamentoItem
     {
         public int RecetaDetalleId { get; set; }
+        public int MedicamentoId { get; set; }
         public byte Orden { get; set; }
         public string CodigoMedicamento { get; set; } = string.Empty;
         public string NombreMedicamento { get; set; } = string.Empty;
@@ -37,6 +38,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Models.ViewModels
     public class ConsultaEnfermedadItem
     {
         public int ConsultaEnfermedadId { get; set; }
+        public int EnfermedadId { get; set; }
         public string CodigoEnfermedad { get; set; } = string.Empty;
         public string NombreEnfermedad { get; set; } = string.Empty;
         public string TipoEnfermedad { get; set; } = string.Empty;

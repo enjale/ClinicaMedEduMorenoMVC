@@ -260,40 +260,101 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
                 return NotFound();
             }
 
-            ViewBag.EsEnfermera = EsEnfermera();
+            CargarDatosAtencion(modelo.Consulta);
+            return View(modelo);
+        }
 
-            // Solo se ofrecen las enfermedades que aún no están asignadas a la consulta
-            var asignadas = _context.ConsultaEnfermedades
-                .Where(ce => ce.ConsultaId == id)
-                .Select(ce => ce.EnfermedadId)
-                .ToList();
+        // Listas de la pantalla de atención: pacientes, enfermedades y medicamentos
+        private void CargarDatosAtencion(Consultas consulta)
+        {
+            CargarListas(consulta);
 
+            // Sugerencias para el buscador de enfermedades (nombre y tipo).
+            // Las crónicas se registran en el expediente, no como diagnóstico de la consulta.
             ViewBag.Enfermedades = _context.Enfermedades
-                .Where(e => !asignadas.Contains(e.EnfermedadId))
+                .Where(e => e.TipoEnfermedad != "Crónica")
                 .OrderBy(e => e.Nombre)
                 .Select(e => new SelectListItem
                 {
-                    Value = e.EnfermedadId.ToString(),
-                    Text = e.Nombre + " (" + e.TipoEnfermedad + ")"
+                    Value = e.Nombre,
+                    Text = e.TipoEnfermedad
                 })
                 .ToList();
 
-            // Solo se ofrecen los medicamentos que aún no están en la receta
-            var recetados = modelo.Receta == null
-                ? new List<int>()
-                : _context.RecetaDetalles.Where(d => d.RecetaId == modelo.Receta.RecetaId).Select(d => d.MedicamentoId).ToList();
-
+            // Sugerencias para el buscador de medicamentos (nombre y código)
             ViewBag.Medicamentos = _context.Medicamentos
-                .Where(m => !recetados.Contains(m.MedicamentoId))
                 .OrderBy(m => m.Nombre)
                 .Select(m => new SelectListItem
                 {
-                    Value = m.MedicamentoId.ToString(),
-                    Text = m.Nombre + " (" + m.Codigo + ")"
+                    Value = m.Nombre,
+                    Text = m.Codigo
                 })
                 .ToList();
+        }
 
-            return View(modelo);
+        [HttpPost]
+        public IActionResult Atender(int id, [Bind(Prefix = "Consulta")] Consultas datos, bool marcarAtendida)
+        {
+            if (EsEnfermera())
+            {
+                TempData["Error"] = "Acceso denegado: Las enfermeras no tienen permisos para atender consultas.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var consulta = _context.Consultas.Find(id);
+            if (consulta == null)
+            {
+                return NotFound();
+            }
+
+            // Solo se validan los campos que se editan en la pantalla de atención
+            foreach (var clave in ModelState.Keys.Where(k => !k.StartsWith("Consulta.")).ToList())
+            {
+                ModelState.Remove(clave);
+            }
+            ModelState.Remove("Consulta.Codigo");
+            ModelState.Remove("Consulta.UsuarioId");
+            ModelState.Remove("Consulta.Estado");
+
+            if (!_context.Expedientes.Any(e => e.ExpedienteId == datos.ExpedienteId))
+            {
+                ModelState.AddModelError("Consulta.ExpedienteId", "Seleccione un paciente válido");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var modelo = ObtenerDetalle(id)!;
+                modelo.Consulta.ExpedienteId = datos.ExpedienteId;
+                modelo.Consulta.Fecha = datos.Fecha;
+                modelo.Consulta.Motivo = datos.Motivo;
+                modelo.Consulta.Medico = datos.Medico;
+                modelo.Consulta.VitalPeso = datos.VitalPeso;
+                modelo.Consulta.VitalTemperatura = datos.VitalTemperatura;
+                modelo.Consulta.VitalPresion = datos.VitalPresion;
+
+                ViewBag.EsEnfermera = false;
+                CargarDatosAtencion(modelo.Consulta);
+                return View(nameof(Details), modelo);
+            }
+
+            // El código, el usuario que registró y la fecha de creación no cambian
+            consulta.ExpedienteId = datos.ExpedienteId;
+            consulta.Fecha = datos.Fecha;
+            consulta.Motivo = datos.Motivo.Trim();
+            consulta.Medico = string.IsNullOrWhiteSpace(datos.Medico) ? null : datos.Medico.Trim();
+            consulta.VitalPeso = datos.VitalPeso;
+            consulta.VitalTemperatura = datos.VitalTemperatura;
+            consulta.VitalPresion = string.IsNullOrWhiteSpace(datos.VitalPresion) ? null : datos.VitalPresion.Trim();
+
+            if (marcarAtendida)
+            {
+                consulta.Estado = "atendida";
+            }
+
+            _context.SaveChanges();
+
+            TempData["Mensaje"] = $"La consulta médica '{consulta.Codigo}' ha sido actualizada exitosamente.";
+            return RedirectToAction(nameof(Index));
         }
 
         private static int? CalcularEdad(DateTime? fechaNac, DateTime alFecha)
@@ -335,6 +396,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
                                 select new ConsultaEnfermedadItem
                                 {
                                     ConsultaEnfermedadId = ce.ConsultaEnfermedadId,
+                                    EnfermedadId = ce.EnfermedadId,
                                     CodigoEnfermedad = e.Codigo,
                                     NombreEnfermedad = e.Nombre,
                                     TipoEnfermedad = e.TipoEnfermedad,
@@ -356,6 +418,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
                    select new RecetaMedicamentoItem
                    {
                        RecetaDetalleId = d.RecetaDetalleId,
+                       MedicamentoId = d.MedicamentoId,
                        Orden = d.Orden,
                        CodigoMedicamento = m.Codigo,
                        NombreMedicamento = m.Nombre,
@@ -379,7 +442,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult AgregarMedicamento(int consultaId, int medicamentoId, string? prescripcion, string? cantidad)
+        public IActionResult AgregarMedicamento(int consultaId, string? medicamento, string? prescripcion, string? cantidad)
         {
             if (EsEnfermera())
             {
@@ -396,59 +459,148 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
             prescripcion = prescripcion?.Trim();
             cantidad = cantidad?.Trim();
 
-            if (!_context.Medicamentos.Any(m => m.MedicamentoId == medicamentoId))
+            var error = ValidarMedicamentoRecetado(medicamento, prescripcion, cantidad);
+            if (error != null)
             {
-                TempData["ErrorReceta"] = "Seleccione un medicamento válido.";
+                TempData["ErrorReceta"] = error;
+                return Redirect(Url.Action(nameof(Details), new { id = consultaId }) + "#receta");
             }
-            else if (string.IsNullOrEmpty(prescripcion) || prescripcion.Length > 200)
+
+            var existente = BuscarMedicamentoPorNombre(medicamento);
+
+            // Una receta por consulta: se crea con el primer medicamento (código REC-<código de consulta>)
+            var receta = _context.Recetas.Where(r => r.ConsultaId == consultaId).OrderBy(r => r.RecetaId).FirstOrDefault();
+
+            if (receta != null && existente != null &&
+                _context.RecetaDetalles.Any(d => d.RecetaId == receta.RecetaId && d.MedicamentoId == existente.MedicamentoId))
             {
-                TempData["ErrorReceta"] = "La prescripción es obligatoria (máximo 200 caracteres).";
+                TempData["ErrorReceta"] = "Ese medicamento ya está en la receta.";
+                return Redirect(Url.Action(nameof(Details), new { id = consultaId }) + "#receta");
             }
-            else if (string.IsNullOrEmpty(cantidad) || cantidad.Length > 100)
+
+            if (receta == null)
             {
-                TempData["ErrorReceta"] = "La cantidad es obligatoria (máximo 100 caracteres).";
+                receta = new Recetas
+                {
+                    Codigo = GenerarCodigoReceta(consulta.Codigo),
+                    ConsultaId = consultaId,
+                    Fecha = DateTime.Today,
+                    Medico = consulta.Medico
+                };
+                _context.Recetas.Add(receta);
+                _context.SaveChanges();
+            }
+
+            var ultimoOrden = _context.RecetaDetalles
+                .Where(d => d.RecetaId == receta.RecetaId)
+                .Select(d => (int?)d.Orden)
+                .Max() ?? 0;
+
+            _context.RecetaDetalles.Add(new RecetaDetalle
+            {
+                RecetaId = receta.RecetaId,
+                MedicamentoId = (existente ?? AgregarMedicamentoAlCatalogo(medicamento!)).MedicamentoId,
+                Orden = (byte)Math.Min(ultimoOrden + 1, byte.MaxValue),
+                Prescripcion = prescripcion!,
+                Cantidad = cantidad!
+            });
+            _context.SaveChanges();
+
+            return Redirect(Url.Action(nameof(Details), new { id = consultaId }) + "#receta");
+        }
+
+        [HttpPost]
+        public IActionResult EditarMedicamento(int id, string? medicamento, string? prescripcion, string? cantidad)
+        {
+            if (EsEnfermera())
+            {
+                TempData["Error"] = "Acceso restringido: Las enfermeras no pueden modificar recetas médicas.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var detalle = _context.RecetaDetalles.Find(id);
+            if (detalle == null)
+            {
+                return NotFound();
+            }
+
+            var consultaId = _context.Recetas
+                .Where(r => r.RecetaId == detalle.RecetaId)
+                .Select(r => r.ConsultaId)
+                .FirstOrDefault();
+
+            prescripcion = prescripcion?.Trim();
+            cantidad = cantidad?.Trim();
+
+            var existente = BuscarMedicamentoPorNombre(medicamento);
+            var error = ValidarMedicamentoRecetado(medicamento, prescripcion, cantidad);
+
+            if (error != null)
+            {
+                TempData["ErrorReceta"] = error;
+            }
+            else if (existente != null && _context.RecetaDetalles.Any(d => d.RecetaId == detalle.RecetaId && d.MedicamentoId == existente.MedicamentoId && d.RecetaDetalleId != id))
+            {
+                TempData["ErrorReceta"] = "Ese medicamento ya está en la receta.";
             }
             else
             {
-                // Una receta por consulta: se crea con el primer medicamento (código REC-<código de consulta>)
-                var receta = _context.Recetas.Where(r => r.ConsultaId == consultaId).OrderBy(r => r.RecetaId).FirstOrDefault();
-                if (receta == null)
-                {
-                    receta = new Recetas
-                    {
-                        Codigo = GenerarCodigoReceta(consulta.Codigo),
-                        ConsultaId = consultaId,
-                        Fecha = DateTime.Today,
-                        Medico = consulta.Medico
-                    };
-                    _context.Recetas.Add(receta);
-                    _context.SaveChanges();
-                }
-
-                if (_context.RecetaDetalles.Any(d => d.RecetaId == receta.RecetaId && d.MedicamentoId == medicamentoId))
-                {
-                    TempData["ErrorReceta"] = "Ese medicamento ya está en la receta.";
-                }
-                else
-                {
-                    var ultimoOrden = _context.RecetaDetalles
-                        .Where(d => d.RecetaId == receta.RecetaId)
-                        .Select(d => (int?)d.Orden)
-                        .Max() ?? 0;
-
-                    _context.RecetaDetalles.Add(new RecetaDetalle
-                    {
-                        RecetaId = receta.RecetaId,
-                        MedicamentoId = medicamentoId,
-                        Orden = (byte)Math.Min(ultimoOrden + 1, byte.MaxValue),
-                        Prescripcion = prescripcion,
-                        Cantidad = cantidad
-                    });
-                    _context.SaveChanges();
-                }
+                detalle.MedicamentoId = (existente ?? AgregarMedicamentoAlCatalogo(medicamento!)).MedicamentoId;
+                detalle.Prescripcion = prescripcion!;
+                detalle.Cantidad = cantidad!;
+                _context.SaveChanges();
             }
 
             return Redirect(Url.Action(nameof(Details), new { id = consultaId }) + "#receta");
+        }
+
+        private static string? ValidarMedicamentoRecetado(string? medicamento, string? prescripcion, string? cantidad)
+        {
+            if (string.IsNullOrWhiteSpace(medicamento) || medicamento.Trim().Length > 200)
+                return "Debe indicar el medicamento (máximo 200 caracteres).";
+
+            if (string.IsNullOrEmpty(prescripcion) || prescripcion.Length > 200)
+                return "La prescripción es obligatoria (máximo 200 caracteres).";
+
+            if (string.IsNullOrEmpty(cantidad) || cantidad.Length > 100)
+                return "La cantidad es obligatoria (máximo 100 caracteres).";
+
+            return null;
+        }
+
+        private Medicamentos? BuscarMedicamentoPorNombre(string? nombre)
+        {
+            if (string.IsNullOrWhiteSpace(nombre)) return null;
+
+            nombre = nombre.Trim();
+            return _context.Medicamentos.FirstOrDefault(m => m.Nombre == nombre);
+        }
+
+        // Si el medicamento escrito no existe en el catálogo, se registra con el siguiente código MED-### (igual que en el prototipo)
+        private Medicamentos AgregarMedicamentoAlCatalogo(string nombre)
+        {
+            var codigos = _context.Medicamentos.Select(m => m.Codigo).ToList();
+            int maxNumero = 0;
+
+            foreach (var cod in codigos)
+            {
+                if (string.IsNullOrWhiteSpace(cod)) continue;
+                var match = System.Text.RegularExpressions.Regex.Match(cod, @"\d+");
+                if (match.Success && int.TryParse(match.Value, out int num))
+                {
+                    if (num > maxNumero) maxNumero = num;
+                }
+            }
+
+            var nuevo = new Medicamentos
+            {
+                Codigo = $"MED-{maxNumero + 1:D3}",
+                Nombre = nombre.Trim()
+            };
+
+            _context.Medicamentos.Add(nuevo);
+            _context.SaveChanges();
+            return nuevo;
         }
 
         private string GenerarCodigoReceta(string codigoConsulta)
@@ -654,7 +806,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
         }
 
         [HttpPost]
-        public IActionResult AsignarEnfermedad(int consultaId, int enfermedadId, string? observaciones)
+        public IActionResult AsignarEnfermedad(int consultaId, string? enfermedad, string? observaciones)
         {
             if (EsEnfermera())
             {
@@ -667,12 +819,14 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
                 return NotFound();
             }
 
-            if (!_context.Enfermedades.Any(e => e.EnfermedadId == enfermedadId))
+            var existente = BuscarEnfermedadPorNombre(enfermedad);
+
+            if (!ValidarNombreEnfermedad(enfermedad))
             {
-                TempData["ErrorEnfermedad"] = "Seleccione una enfermedad válida.";
+                TempData["ErrorEnfermedad"] = "Debe indicar la enfermedad (máximo 100 caracteres).";
             }
             // La BD no permite repetir la misma enfermedad en una consulta (UQ_ConsultaEnfermedades)
-            else if (_context.ConsultaEnfermedades.Any(ce => ce.ConsultaId == consultaId && ce.EnfermedadId == enfermedadId))
+            else if (existente != null && _context.ConsultaEnfermedades.Any(ce => ce.ConsultaId == consultaId && ce.EnfermedadId == existente.EnfermedadId))
             {
                 TempData["ErrorEnfermedad"] = "Esa enfermedad ya está asignada a la consulta.";
             }
@@ -681,13 +835,89 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
                 _context.ConsultaEnfermedades.Add(new ConsultaEnfermedades
                 {
                     ConsultaId = consultaId,
-                    EnfermedadId = enfermedadId,
+                    EnfermedadId = (existente ?? AgregarEnfermedadAlCatalogo(enfermedad!)).EnfermedadId,
                     Observaciones = string.IsNullOrWhiteSpace(observaciones) ? null : observaciones.Trim()
                 });
                 _context.SaveChanges();
             }
 
-            return RedirectToAction(nameof(Details), new { id = consultaId });
+            return Redirect(Url.Action(nameof(Details), new { id = consultaId }) + "#diagnostico");
+        }
+
+        [HttpPost]
+        public IActionResult EditarEnfermedad(int id, string? enfermedad, string? observaciones)
+        {
+            if (EsEnfermera())
+            {
+                TempData["Error"] = "Acceso restringido: Las enfermeras no pueden modificar diagnósticos.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var registro = _context.ConsultaEnfermedades.Find(id);
+            if (registro == null)
+            {
+                return NotFound();
+            }
+
+            var existente = BuscarEnfermedadPorNombre(enfermedad);
+
+            if (!ValidarNombreEnfermedad(enfermedad))
+            {
+                TempData["ErrorEnfermedad"] = "Debe indicar la enfermedad (máximo 100 caracteres).";
+            }
+            else if (existente != null && _context.ConsultaEnfermedades.Any(ce => ce.ConsultaId == registro.ConsultaId && ce.EnfermedadId == existente.EnfermedadId && ce.ConsultaEnfermedadId != id))
+            {
+                TempData["ErrorEnfermedad"] = "Esa enfermedad ya está asignada a la consulta.";
+            }
+            else
+            {
+                registro.EnfermedadId = (existente ?? AgregarEnfermedadAlCatalogo(enfermedad!)).EnfermedadId;
+                registro.Observaciones = string.IsNullOrWhiteSpace(observaciones) ? null : observaciones.Trim();
+                _context.SaveChanges();
+            }
+
+            return Redirect(Url.Action(nameof(Details), new { id = registro.ConsultaId }) + "#diagnostico");
+        }
+
+        private static bool ValidarNombreEnfermedad(string? nombre)
+        {
+            return !string.IsNullOrWhiteSpace(nombre) && nombre.Trim().Length <= 100;
+        }
+
+        private Enfermedades? BuscarEnfermedadPorNombre(string? nombre)
+        {
+            if (string.IsNullOrWhiteSpace(nombre)) return null;
+
+            nombre = nombre.Trim();
+            return _context.Enfermedades.FirstOrDefault(e => e.Nombre == nombre);
+        }
+
+        // Si la enfermedad escrita no existe en el catálogo, se registra como tipo "Otra" (igual que en el prototipo)
+        private Enfermedades AgregarEnfermedadAlCatalogo(string nombre)
+        {
+            var codigos = _context.Enfermedades.Select(e => e.Codigo).ToList();
+            int maxNumero = 0;
+
+            foreach (var cod in codigos)
+            {
+                if (string.IsNullOrWhiteSpace(cod)) continue;
+                var match = System.Text.RegularExpressions.Regex.Match(cod, @"\d+");
+                if (match.Success && int.TryParse(match.Value, out int num))
+                {
+                    if (num > maxNumero) maxNumero = num;
+                }
+            }
+
+            var nueva = new Enfermedades
+            {
+                Codigo = $"ENF-{maxNumero + 1:D3}",
+                Nombre = nombre.Trim(),
+                TipoEnfermedad = "Otra"
+            };
+
+            _context.Enfermedades.Add(nueva);
+            _context.SaveChanges();
+            return nueva;
         }
 
         [HttpPost]
@@ -709,7 +939,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
             _context.ConsultaEnfermedades.Remove(registro);
             _context.SaveChanges();
 
-            return RedirectToAction(nameof(Details), new { id = registro.ConsultaId });
+            return Redirect(Url.Action(nameof(Details), new { id = registro.ConsultaId }) + "#diagnostico");
         }
 
         public IActionResult Delete(int id)

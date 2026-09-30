@@ -8,10 +8,12 @@
                       || User.IsInRole("Enfermera")
                       || (ViewBag.EsEnfermera is bool b && b);
     ViewData["Title"] = esEnfermera ? "Detalle de Consulta" : "Atención de Consulta";
-    ViewData["Seccion"] = "Consultas Médicas";
+    ViewData["Seccion"] = "Atención de Consulta";
     var c = Model.Consulta;
-    var enfermedadesDisponibles = (ViewBag.Enfermedades as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>) ?? new();
-    var medicamentosDisponibles = (ViewBag.Medicamentos as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>) ?? new();
+    var atendida = c.Estado == "atendida";
+    var enfermedades = (ViewBag.Enfermedades as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>) ?? new();
+    var medicamentos = (ViewBag.Medicamentos as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>) ?? new();
+    var medicos = (ViewBag.Medicos as List<string>) ?? new List<string>();
 }
 
 <div class="row justify-content-center">
@@ -20,9 +22,6 @@
         @if (TempData["Mensaje"] is string msg)
         {
             <div class="alert alert-success alert-dismissible fade show py-2 mb-3" role="alert">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2" viewBox="0 0 16 16">
-                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-                </svg>
                 @msg
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
             </div>
@@ -30,116 +29,119 @@
         @if (TempData["Error"] is string err)
         {
             <div class="alert alert-danger alert-dismissible fade show py-2 mb-3" role="alert">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2" viewBox="0 0 16 16">
-                    <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-                </svg>
                 @err
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
             </div>
         }
 
-        <!-- Datos de la consulta -->
-        <div class="card-clinica mb-4">
-            <div class="card-clinica-header">
-                <div>
-                    <h2 class="card-clinica-titulo">
-                        @(esEnfermera ? "Detalle de Consulta" : "Atención de Consulta")
-                        <span class="badge-codigo ms-2">@c.Codigo</span>
-                    </h2>
-                    <div class="card-clinica-subtitulo">Información de la consulta y signos vitales del paciente</div>
-                </div>
-                <div class="d-flex gap-2">
-                    <a asp-action="Expediente" asp-route-id="@c.ExpedienteId" asp-route-consultaId="@c.ConsultaId" class="btn btn-sm btn-outline-primary">
-                        Ver expediente completo
-                    </a>
-                    <a asp-action="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
+        <!-- Encabezado -->
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                <h2 class="card-clinica-titulo mb-0">@(esEnfermera ? "Detalle de Consulta Médica" : "Atención de Consulta Médica")</h2>
+                <div class="card-clinica-subtitulo">
+                    <a asp-action="Index" class="text-decoration-none text-muted">Consultas</a> / @c.Codigo
                 </div>
             </div>
-
-            <div class="bg-light p-3 rounded mb-3 border">
-                <div class="row mb-3">
-                    <div class="col-sm-3 text-muted fw-bold">Paciente:</div>
-                    <div class="col-sm-9 fw-semibold">
-                        @Model.NombrePaciente
-                        @if (!string.IsNullOrEmpty(Model.CodigoExpediente))
-                        {
-                            <span class="text-muted small ms-2">Expediente @Model.CodigoExpediente</span>
-                        }
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-sm-3 text-muted fw-bold">@Html.DisplayNameFor(m => m.Consulta.Fecha):</div>
-                    <div class="col-sm-3">@c.Fecha.ToString("dd/MM/yyyy")</div>
-                    <div class="col-sm-3 text-muted fw-bold">@Html.DisplayNameFor(m => m.Consulta.Estado):</div>
-                    <div class="col-sm-3"><partial name="_EstadoBadge" model="c.Estado" /></div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-sm-3 text-muted fw-bold">@Html.DisplayNameFor(m => m.Consulta.Medico):</div>
-                    <div class="col-sm-3">@(string.IsNullOrEmpty(c.Medico) ? "Sin asignar" : c.Medico)</div>
-                    <div class="col-sm-3 text-muted fw-bold">@Html.DisplayNameFor(m => m.Consulta.UsuarioId):</div>
-                    <div class="col-sm-3">@Model.RegistradoPor</div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-3 text-muted fw-bold">@Html.DisplayNameFor(m => m.Consulta.Motivo):</div>
-                    <div class="col-sm-9" style="white-space: pre-line;">@c.Motivo</div>
-                </div>
-            </div>
-
-            <h6 class="text-muted fw-bold mb-3">Signos vitales</h6>
-            <div class="row text-center mb-3">
-                <div class="col-md-4 mb-2">
-                    <div class="border rounded p-3">
-                        <div class="text-muted small">@Html.DisplayNameFor(m => m.Consulta.VitalPeso)</div>
-                        <div class="fs-5 fw-semibold">@(c.VitalPeso?.ToString("0.##") ?? "—")</div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-2">
-                    <div class="border rounded p-3">
-                        <div class="text-muted small">@Html.DisplayNameFor(m => m.Consulta.VitalTemperatura)</div>
-                        <div class="fs-5 fw-semibold">@(c.VitalTemperatura?.ToString("0.0") ?? "—")</div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-2">
-                    <div class="border rounded p-3">
-                        <div class="text-muted small">@Html.DisplayNameFor(m => m.Consulta.VitalPresion)</div>
-                        <div class="fs-5 fw-semibold">@(string.IsNullOrEmpty(c.VitalPresion) ? "—" : c.VitalPresion)</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
-                <a asp-action="Index" class="btn btn-outline-secondary">Volver al listado</a>
-                @if (!esEnfermera)
-                {
-                    <a asp-action="Edit" asp-route-id="@c.ConsultaId" class="btn btn-primary shadow-sm">Editar Consulta</a>
-                }
+            <div class="d-flex gap-2">
+                <a asp-action="Expediente" asp-route-id="@c.ExpedienteId" asp-route-consultaId="@c.ConsultaId" class="btn btn-sm btn-outline-secondary">
+                    Ver Expediente
+                </a>
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
             </div>
         </div>
 
-        <!-- Padecimientos y diagnósticos -->
-        <div class="card-clinica">
-            <div class="card-clinica-header">
-                <div>
-                    <h2 class="card-clinica-titulo">Padecimientos y Diagnósticos</h2>
-                    <div class="card-clinica-subtitulo">Enfermedades asignadas a esta consulta con su diagnóstico u observaciones</div>
+        <!-- Datos y signos vitales: formulario principal de la atención -->
+        <form asp-action="Atender" asp-route-id="@c.ConsultaId" method="post" id="formAtencion">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 mb-3"></div>
+
+            <fieldset disabled="@esEnfermera">
+                <div class="card-clinica mb-4">
+                    <h6 class="text-muted fw-bold mb-3">Datos de la Consulta Médica</h6>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">ID de Consulta</label>
+                            <input value="@c.Codigo" class="form-control bg-light" readonly style="font-weight: 600; color: var(--color-principal-oscuro);" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Consulta.Medico" class="form-label">Médico Responsable</label>
+                            <input asp-for="Consulta.Medico" class="form-control" list="listaMedicos" />
+                            <datalist id="listaMedicos">
+                                @foreach (var medico in medicos)
+                                {
+                                    <option value="@medico"></option>
+                                }
+                            </datalist>
+                            <span asp-validation-for="Consulta.Medico" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Consulta.Fecha" class="form-label">Fecha de Consulta *</label>
+                            <input asp-for="Consulta.Fecha" type="date" class="form-control" required />
+                            <span asp-validation-for="Consulta.Fecha" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Consulta.ExpedienteId" class="form-label">Paciente *</label>
+                        <select asp-for="Consulta.ExpedienteId" asp-items="ViewBag.Expedientes" class="form-select" required>
+                            <option value="">-- Seleccione un paciente --</option>
+                        </select>
+                        <span asp-validation-for="Consulta.ExpedienteId" class="text-danger small"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Consulta.Motivo" class="form-label">Motivo de Consulta *</label>
+                        <textarea asp-for="Consulta.Motivo" class="form-control" rows="2" placeholder="Ej: Dolor de cabeza persistente" required></textarea>
+                        <span asp-validation-for="Consulta.Motivo" class="text-danger small"></span>
+                    </div>
                 </div>
+
+                <div class="card-clinica mb-4">
+                    <h6 class="text-muted fw-bold mb-3">🩺 Signos Vitales</h6>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Consulta.VitalPeso" class="form-label">Peso (kg)</label>
+                            <input asp-for="Consulta.VitalPeso" type="number" step="0.01" min="0.1" max="500" class="form-control" placeholder="Ej: 70.5" />
+                            <span asp-validation-for="Consulta.VitalPeso" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Consulta.VitalTemperatura" class="form-label">Temperatura (°C)</label>
+                            <input asp-for="Consulta.VitalTemperatura" type="number" step="0.1" min="30" max="45" class="form-control" placeholder="Ej: 36.5" />
+                            <span asp-validation-for="Consulta.VitalTemperatura" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Consulta.VitalPresion" class="form-label">Presión Arterial (mmHg)</label>
+                            <input asp-for="Consulta.VitalPresion" class="form-control" placeholder="Ej: 120/80" />
+                            <span asp-validation-for="Consulta.VitalPresion" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+
+        <!-- Diagnóstico -->
+        <div class="card-clinica mb-4" id="diagnostico">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="text-muted fw-bold mb-0">Diagnóstico</h6>
+                @if (!esEnfermera)
+                {
+                    <button type="button" class="btn btn-primary btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#modalEnfermedad">
+                        Agregar Enfermedad
+                    </button>
+                }
             </div>
 
-            @if (TempData["ErrorEnfermedad"] is string error)
+            @if (TempData["ErrorEnfermedad"] is string errorEnfermedad)
             {
-                <div class="alert alert-danger py-2 mb-3">@error</div>
+                <div class="alert alert-danger py-2 mb-3">@errorEnfermedad</div>
             }
 
-            <div class="table-responsive mb-4">
+            <div class="table-responsive">
                 <table class="table align-middle mb-0">
                     <thead>
                         <tr>
-                            <th style="width: 15%;">Código</th>
-                            <th style="width: 25%;">Enfermedad</th>
-                            <th style="@(esEnfermera ? "width: 60%;" : "width: 45%;")">Diagnóstico / Observaciones</th>
+                            <th style="width: 35%;">Enfermedad</th>
+                            <th>Observaciones</th>
                             @if (!esEnfermera)
                             {
-                                <th style="width: 15%;" class="text-end">Acciones</th>
+                                <th style="width: 20%;" class="text-end"></th>
                             }
                         </tr>
                     </thead>
@@ -149,18 +151,20 @@
                             @foreach (var item in Model.Enfermedades)
                             {
                                 <tr>
-                                    <td><span class="badge-codigo">@item.CodigoEnfermedad</span></td>
-                                    <td class="fw-semibold">
-                                        @item.NombreEnfermedad
-                                        <div class="text-muted small">@item.TipoEnfermedad</div>
-                                    </td>
-                                    <td style="white-space: pre-line;">@(string.IsNullOrEmpty(item.Observaciones) ? "—" : item.Observaciones)</td>
+                                    <td class="fw-semibold">@item.NombreEnfermedad</td>
+                                    <td style="white-space: pre-line;">@(string.IsNullOrEmpty(item.Observaciones) ? "-" : item.Observaciones)</td>
                                     @if (!esEnfermera)
                                     {
-                                        <td class="text-end">
+                                        <td class="text-end text-nowrap">
+                                            <button type="button" class="btn btn-sm btn-outline-primary me-1 btn-editar-enfermedad"
+                                                    data-id="@item.ConsultaEnfermedadId"
+                                                    data-nombre="@item.NombreEnfermedad"
+                                                    data-observaciones="@item.Observaciones">
+                                                Editar
+                                            </button>
                                             <form asp-action="QuitarEnfermedad" asp-route-id="@item.ConsultaEnfermedadId" method="post" class="d-inline"
-                                                  onsubmit="return confirm('¿Desea quitar esta enfermedad de la consulta?');">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">Quitar</button>
+                                                  onsubmit="return confirm('¿Está seguro de que desea eliminar esta enfermedad del diagnóstico?');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
                                             </form>
                                         </td>
                                     }
@@ -170,75 +174,30 @@
                         else
                         {
                             <tr>
-                                <td colspan="@(esEnfermera ? 3 : 4)" class="text-center text-muted py-4">
-                                    <p class="mb-0">
-                                        @(esEnfermera ? "Aún no se han asignado diagnósticos médicos a esta consulta." : "Aún no se han asignado padecimientos a esta consulta.")
-                                    </p>
-                                </td>
+                                <td colspan="3" class="text-center text-muted py-4">Aún no se han agregado enfermedades al diagnóstico.</td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
-
-            @if (!esEnfermera)
-            {
-                <h6 class="text-muted fw-bold mb-3">Asignar padecimiento</h6>
-                @if (enfermedadesDisponibles.Any())
-                {
-                    <form asp-action="AsignarEnfermedad" method="post" class="bg-light p-3 rounded border">
-                        <input type="hidden" name="consultaId" value="@c.ConsultaId" />
-
-                        <div class="mb-3">
-                            <label for="enfermedadId" class="form-label">Enfermedad</label>
-                            <select id="enfermedadId" name="enfermedadId" asp-items="enfermedadesDisponibles" class="form-select" required>
-                                <option value="">-- Seleccione una enfermedad --</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="observaciones" class="form-label">Diagnóstico / Observaciones</label>
-                            <textarea id="observaciones" name="observaciones" class="form-control" rows="3"
-                                      placeholder="Describa el diagnóstico, hallazgos y recomendaciones"></textarea>
-                        </div>
-
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary shadow-sm">+ Asignar</button>
-                        </div>
-                    </form>
-                }
-                else
-                {
-                    <p class="text-muted mb-0">
-                        No hay más enfermedades disponibles en el catálogo.
-                        <a asp-controller="Enfermedades" asp-action="Create">Registrar una nueva enfermedad</a>.
-                    </p>
-                }
-            }
-            else
-            {
-                <div class="alert alert-light border py-2 text-muted small d-flex align-items-center mb-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2 flex-shrink-0" viewBox="0 0 16 16">
-                        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
-                    </svg>
-                    <span>El diagnóstico y asignación de padecimientos es una función exclusiva del médico tratante.</span>
-                </div>
-            }
         </div>
 
-        <!-- Receta médica -->
-        <div class="card-clinica mt-4" id="receta">
-            <div class="card-clinica-header">
-                <div>
-                    <h2 class="card-clinica-titulo">
-                        Receta Médica
-                        @if (Model.Receta != null)
-                        {
-                            <span class="badge-codigo ms-2">@Model.Receta.Codigo</span>
-                        }
-                    </h2>
-                    <div class="card-clinica-subtitulo">Medicamentos recetados en esta consulta con su prescripción</div>
-                </div>
+        <!-- Medicamentos recetados -->
+        <div class="card-clinica mb-4" id="receta">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="text-muted fw-bold mb-0">
+                    Medicamentos Recetados
+                    @if (Model.Receta != null)
+                    {
+                        <span class="badge-codigo ms-2">@Model.Receta.Codigo</span>
+                    }
+                </h6>
+                @if (!esEnfermera)
+                {
+                    <button type="button" class="btn btn-primary btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#modalMedicamento">
+                        Agregar Medicamento
+                    </button>
+                }
             </div>
 
             @if (TempData["ErrorReceta"] is string errorReceta)
@@ -246,17 +205,16 @@
                 <div class="alert alert-danger py-2 mb-3">@errorReceta</div>
             }
 
-            <div class="table-responsive mb-4">
+            <div class="table-responsive">
                 <table class="table align-middle mb-0">
                     <thead>
                         <tr>
-                            <th style="width: 5%;">#</th>
-                            <th style="width: 30%;">Medicamento</th>
-                            <th style="@(esEnfermera ? "width: 45%;" : "width: 35%;")">Prescripción</th>
-                            <th style="@(esEnfermera ? "width: 20%;" : "width: 15%;")">Cantidad</th>
+                            <th style="width: 25%;">Medicamento</th>
+                            <th>Prescripción</th>
+                            <th style="width: 18%;">Cantidad</th>
                             @if (!esEnfermera)
                             {
-                                <th style="width: 15%;" class="text-end">Acciones</th>
+                                <th style="width: 20%;" class="text-end"></th>
                             }
                         </tr>
                     </thead>
@@ -266,19 +224,22 @@
                             @foreach (var med in Model.Medicamentos)
                             {
                                 <tr>
-                                    <td class="text-muted">@med.Orden</td>
-                                    <td class="fw-semibold">
-                                        @med.NombreMedicamento
-                                        <div class="text-muted small">@med.CodigoMedicamento</div>
-                                    </td>
+                                    <td class="fw-semibold">@med.NombreMedicamento</td>
                                     <td>@med.Prescripcion</td>
                                     <td>@med.Cantidad</td>
                                     @if (!esEnfermera)
                                     {
-                                        <td class="text-end">
+                                        <td class="text-end text-nowrap">
+                                            <button type="button" class="btn btn-sm btn-outline-primary me-1 btn-editar-medicamento"
+                                                    data-id="@med.RecetaDetalleId"
+                                                    data-nombre="@med.NombreMedicamento"
+                                                    data-prescripcion="@med.Prescripcion"
+                                                    data-cantidad="@med.Cantidad">
+                                                Editar
+                                            </button>
                                             <form asp-action="QuitarMedicamento" asp-route-id="@med.RecetaDetalleId" method="post" class="d-inline"
-                                                  onsubmit="return confirm('¿Desea quitar este medicamento de la receta?');">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">Quitar</button>
+                                                  onsubmit="return confirm('¿Está seguro de que desea eliminar este medicamento?');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
                                             </form>
                                         </td>
                                     }
@@ -288,67 +249,220 @@
                         else
                         {
                             <tr>
-                                <td colspan="@(esEnfermera ? 4 : 5)" class="text-center text-muted py-4">
-                                    <p class="mb-0">
-                                        @(esEnfermera ? "Aún no se han recetado medicamentos en esta consulta." : "Aún no se han recetado medicamentos en esta consulta.")
-                                    </p>
-                                </td>
+                                <td colspan="4" class="text-center text-muted py-4">Aún no se han recetado medicamentos en esta consulta.</td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
+        </div>
 
-            @if (!esEnfermera)
-            {
-                <h6 class="text-muted fw-bold mb-3">Recetar medicamento</h6>
-                @if (medicamentosDisponibles.Any())
+        <!-- Acciones -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                @if (!esEnfermera)
                 {
-                    <form asp-action="AgregarMedicamento" method="post" class="bg-light p-3 rounded border">
-                        <input type="hidden" name="consultaId" value="@c.ConsultaId" />
-
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label for="medicamentoId" class="form-label">Medicamento</label>
-                                <select id="medicamentoId" name="medicamentoId" asp-items="medicamentosDisponibles" class="form-select" required>
-                                    <option value="">-- Seleccione un medicamento --</option>
-                                </select>
-                            </div>
-                            <div class="col-md-5 mb-3">
-                                <label for="prescripcion" class="form-label">Prescripción</label>
-                                <input id="prescripcion" name="prescripcion" class="form-control" maxlength="200" required
-                                       placeholder="Ej. 1 tableta cada 8 horas por 5 días" />
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <label for="cantidad" class="form-label">Cantidad</label>
-                                <input id="cantidad" name="cantidad" class="form-control" maxlength="100" required
-                                       placeholder="Ej. 15 tabletas" />
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary shadow-sm">+ Recetar</button>
-                        </div>
-                    </form>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="marcarAtendida" value="true" id="chkAtendida" form="formAtencion"
+                               checked="@atendida" disabled="@atendida" />
+                        <label class="form-check-label fw-semibold" for="chkAtendida">Marcar como atendida</label>
+                    </div>
                 }
-                else
+            </div>
+            <div class="d-flex gap-2">
+                <a asp-action="Index" class="btn btn-outline-secondary">@(esEnfermera ? "Volver" : "Cancelar")</a>
+                <a asp-action="Imprimir" asp-route-id="@c.ConsultaId" target="_blank" class="btn btn-outline-secondary">Imprimir Receta</a>
+                @if (!esEnfermera)
                 {
-                    <p class="text-muted mb-0">
-                        No hay más medicamentos disponibles en el catálogo.
-                        <a asp-controller="Medicamentos" asp-action="Create">Registrar un nuevo medicamento</a>.
-                    </p>
+                    <button type="submit" form="formAtencion" class="btn btn-primary shadow-sm">Guardar Cambios</button>
                 }
-            }
-            else
-            {
-                <div class="alert alert-light border py-2 text-muted small d-flex align-items-center mb-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2 flex-shrink-0" viewBox="0 0 16 16">
-                        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
-                    </svg>
-                    <span>La prescripción y adición de medicamentos está reservada exclusivamente para el médico tratante.</span>
-                </div>
-            }
+            </div>
         </div>
 
     </div>
 </div>
+
+@if (!esEnfermera)
+{
+    <!-- Modal: agregar / editar enfermedad -->
+    <div class="modal fade" id="modalEnfermedad" tabindex="-1" aria-labelledby="tituloModalEnfermedad" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="post" id="formEnfermedad" class="modal-content"
+                  data-accion-agregar="@Url.Action("AsignarEnfermedad")"
+                  data-accion-editar="@Url.Action("EditarEnfermedad")"
+                  action="@Url.Action("AsignarEnfermedad")">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="consultaId" value="@c.ConsultaId" />
+                <input type="hidden" name="id" id="enfermedadRegistroId" disabled />
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tituloModalEnfermedad">Agregar Enfermedad a la Consulta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="enfermedad" class="form-label">Enfermedad</label>
+                        <input id="enfermedad" name="enfermedad" class="form-control" list="listaEnfermedades"
+                               maxlength="100" autocomplete="off" required placeholder="Escriba para buscar..." />
+                        <datalist id="listaEnfermedades">
+                            @foreach (var enf in enfermedades)
+                            {
+                                <option value="@enf.Value">@enf.Text</option>
+                            }
+                        </datalist>
+                        <small class="text-muted d-block mt-1">
+                            Si la enfermedad no existe, se agregará al catálogo como tipo "Otra".
+                        </small>
+                    </div>
+                    <div>
+                        <label for="observacionesEnfermedad" class="form-label">Observaciones</label>
+                        <textarea id="observacionesEnfermedad" name="observaciones" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: agregar / editar medicamento -->
+    <div class="modal fade" id="modalMedicamento" tabindex="-1" aria-labelledby="tituloModalMedicamento" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="post" id="formMedicamento" class="modal-content"
+                  data-accion-agregar="@Url.Action("AgregarMedicamento")"
+                  data-accion-editar="@Url.Action("EditarMedicamento")"
+                  action="@Url.Action("AgregarMedicamento")">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="consultaId" value="@c.ConsultaId" />
+                <input type="hidden" name="id" id="medicamentoRegistroId" disabled />
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tituloModalMedicamento">Agregar Medicamento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="medicamento" class="form-label">Medicamento</label>
+                        <input id="medicamento" name="medicamento" class="form-control" list="listaMedicamentos"
+                               maxlength="200" autocomplete="off" required placeholder="Escriba para buscar..." />
+                        <datalist id="listaMedicamentos">
+                            @foreach (var m in medicamentos)
+                            {
+                                <option value="@m.Value">@m.Text</option>
+                            }
+                        </datalist>
+                        <small class="text-muted d-block mt-1">
+                            Si el medicamento no existe, se agregará al catálogo de medicamentos.
+                        </small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="prescripcion" class="form-label">Prescripción</label>
+                        <input id="prescripcion" name="prescripcion" class="form-control" maxlength="200" required
+                               placeholder="Ej: 1 tableta cada 8 horas por 5 días" />
+                    </div>
+                    <div>
+                        <label for="cantidad" class="form-label">Cantidad</label>
+                        <input id="cantidad" name="cantidad" class="form-control" maxlength="100" required
+                               placeholder="Ej: 15 tabletas" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Un mismo modal sirve para agregar y para editar: al editar se cambia la acción y se precargan los datos
+        function configurarModal(idModal, idForm, idRegistro, tituloAgregar, tituloEditar, claseBoton, precargar) {
+            const modal = document.getElementById(idModal);
+            if (!modal) return;
+            const form = document.getElementById(idForm);
+            const registro = document.getElementById(idRegistro);
+            const titulo = modal.querySelector('.modal-title');
+
+            document.querySelectorAll(claseBoton).forEach(function (boton) {
+                boton.addEventListener('click', function () {
+                    form.action = form.dataset.accionEditar;
+                    registro.disabled = false;
+                    registro.value = boton.dataset.id;
+                    titulo.textContent = tituloEditar;
+                    precargar(boton);
+                    bootstrap.Modal.getOrCreateInstance(modal).show();
+                });
+            });
+
+            // Al cerrarse, el modal vuelve a quedar en modo "agregar"
+            modal.addEventListener('hidden.bs.modal', function () {
+                form.reset();
+                form.action = form.dataset.accionAgregar;
+                registro.disabled = true;
+                registro.value = '';
+                titulo.textContent = tituloAgregar;
+            });
+        }
+
+        // Evita guardados dobles: al enviar un formulario se deshabilitan sus botones hasta que termine la petición
+        function botonesDelFormulario(form) {
+            const internos = [...form.querySelectorAll('button[type="submit"]')];
+            const externos = form.id ? [...document.querySelectorAll('button[type="submit"][form="' + form.id + '"]')] : [];
+            return internos.concat(externos);
+        }
+
+        document.querySelectorAll('form').forEach(function (form) {
+            form.addEventListener('submit', function (e) {
+                // Envío cancelado (confirmación rechazada) o datos inválidos: no se bloquea nada
+                if (e.defaultPrevented) return;
+                if (!form.checkValidity()) return;
+                if (window.jQuery && jQuery(form).valid && !jQuery(form).valid()) return;
+
+                // Segundo clic mientras se está enviando: se ignora
+                if (form.dataset.enviando === 'true') {
+                    e.preventDefault();
+                    return;
+                }
+                form.dataset.enviando = 'true';
+
+                botonesDelFormulario(form).forEach(function (boton) {
+                    boton.dataset.textoOriginal = boton.innerHTML;
+                    boton.disabled = true;
+                    const texto = boton.classList.contains('btn-outline-danger') ? 'Eliminando...' : 'Guardando...';
+                    boton.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>' + texto;
+                });
+            });
+        });
+
+        // Si se vuelve a la página con el botón "Atrás" del navegador, los botones quedan habilitados otra vez
+        window.addEventListener('pageshow', function () {
+            document.querySelectorAll('form').forEach(function (form) {
+                form.dataset.enviando = 'false';
+                botonesDelFormulario(form).forEach(function (boton) {
+                    if (boton.dataset.textoOriginal) boton.innerHTML = boton.dataset.textoOriginal;
+                    boton.disabled = false;
+                });
+            });
+        });
+
+        configurarModal('modalEnfermedad', 'formEnfermedad', 'enfermedadRegistroId',
+            'Agregar Enfermedad a la Consulta', 'Editar Diagnóstico', '.btn-editar-enfermedad',
+            function (boton) {
+                document.getElementById('enfermedad').value = boton.dataset.nombre || '';
+                document.getElementById('observacionesEnfermedad').value = boton.dataset.observaciones || '';
+            });
+
+        configurarModal('modalMedicamento', 'formMedicamento', 'medicamentoRegistroId',
+            'Agregar Medicamento', 'Editar Medicamento', '.btn-editar-medicamento',
+            function (boton) {
+                document.getElementById('medicamento').value = boton.dataset.nombre || '';
+                document.getElementById('prescripcion').value = boton.dataset.prescripcion || '';
+                document.getElementById('cantidad').value = boton.dataset.cantidad || '';
+            });
+    </script>
+}

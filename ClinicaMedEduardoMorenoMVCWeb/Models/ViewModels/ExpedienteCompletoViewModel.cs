@@ -24,15 +24,6 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Models.ViewModels
         public List<HistorialConsultaItem> Consultas { get; set; } = new();
     }
 
-    // Datos leídos del expediente con SQL (las columnas pueden venir en NULL)
-    public class ExpedienteDatos
-    {
-        public string Codigo { get; set; } = string.Empty;
-        public int PacienteId { get; set; }
-        public string? Historial { get; set; }
-        public DateTime FechaCreacion { get; set; }
-    }
-
     public class ExpedienteAlergiaItem
     {
         public string Alergia { get; set; } = string.Empty;
@@ -52,7 +43,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Models.ViewModels
     {
         public string Tipo { get; set; } = string.Empty;
         public string Descripcion { get; set; } = string.Empty;
-        public DateTime Fecha { get; set; }
+        public DateTime? Fecha { get; set; }
         public string? Observaciones { get; set; }
     }
 

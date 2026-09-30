@@ -490,11 +490,7 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
 
         public IActionResult Expediente(int id, int? consultaId)
         {
-            // Algunas columnas del expediente aceptan NULL en la BD, por eso se leen con SQL de solo lectura
-            var expediente = _context.Database
-                .SqlQuery<ExpedienteDatos>($"SELECT Codigo, PacienteId, Historial, CAST(FechaCreacion AS datetime2) AS FechaCreacion FROM Expedientes WHERE ExpedienteId = {id}")
-                .AsEnumerable()
-                .FirstOrDefault();
+            var expediente = _context.Expedientes.AsNoTracking().FirstOrDefault(e => e.ExpedienteId == id);
 
             if (expediente == null)
             {
@@ -503,20 +499,39 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
 
             var paciente = _context.Pacientes.AsNoTracking().FirstOrDefault(p => p.PacienteId == expediente.PacienteId) ?? new Pacientes();
 
-            var alergias = _context.Database.SqlQuery<ExpedienteAlergiaItem>(
-                $@"SELECT a.Nombre AS Alergia, ea.Nivel, ea.Observaciones
-                   FROM ExpedienteAlergias ea JOIN Alergias a ON a.AlergiaId = ea.AlergiaId
-                   WHERE ea.ExpedienteId = {id}").ToList();
+            var alergias = (from ea in _context.ExpedienteAlergias
+                            join a in _context.Alergias on ea.AlergiaId equals a.AlergiaId
+                            where ea.ExpedienteId == id
+                            orderby a.Nombre
+                            select new ExpedienteAlergiaItem
+                            {
+                                Alergia = a.Nombre,
+                                Nivel = ea.Nivel,
+                                Observaciones = ea.Observaciones
+                            }).ToList();
 
-            var enfermedades = _context.Database.SqlQuery<ExpedienteEnfermedadItem>(
-                $@"SELECT e.Nombre AS Enfermedad, e.TipoEnfermedad, CAST(ee.FechaDeteccion AS datetime2) AS FechaDeteccion, ee.Observaciones
-                   FROM ExpedienteEnfermedades ee JOIN Enfermedades e ON e.EnfermedadId = ee.EnfermedadId
-                   WHERE ee.ExpedienteId = {id}").ToList();
+            var enfermedades = (from ee in _context.ExpedienteEnfermedades
+                                join e in _context.Enfermedades on ee.EnfermedadId equals e.EnfermedadId
+                                where ee.ExpedienteId == id
+                                orderby e.Nombre
+                                select new ExpedienteEnfermedadItem
+                                {
+                                    Enfermedad = e.Nombre,
+                                    TipoEnfermedad = e.TipoEnfermedad,
+                                    FechaDeteccion = ee.FechaDeteccion,
+                                    Observaciones = ee.Observaciones
+                                }).ToList();
 
-            var antecedentes = _context.Database.SqlQuery<AntecedenteItem>(
-                $@"SELECT Tipo, Descripcion, CAST(Fecha AS datetime2) AS Fecha, Observaciones
-                   FROM Antecedentes WHERE ExpedienteId = {id}").ToList()
-                .OrderByDescending(a => a.Fecha)
+            var antecedentes = _context.Antecedentes
+                .Where(an => an.ExpedienteId == id)
+                .OrderByDescending(an => an.Fecha)
+                .Select(an => new AntecedenteItem
+                {
+                    Tipo = an.Tipo,
+                    Descripcion = an.Descripcion,
+                    Fecha = an.Fecha,
+                    Observaciones = an.Observaciones
+                })
                 .ToList();
 
             // Historial de consultas con sus diagnósticos y medicamentos recetados

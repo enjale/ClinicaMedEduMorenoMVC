@@ -131,7 +131,10 @@
                             {
                                 <li class="py-2 border-bottom">
                                     <span class="fw-semibold">@an.Tipo</span>
-                                    <span class="text-muted">· @an.Fecha.ToString("dd/MM/yyyy")</span>
+                                    @if (an.Fecha.HasValue)
+                                    {
+                                        <span class="text-muted">· @an.Fecha.Value.ToString("dd/MM/yyyy")</span>
+                                    }
                                     <div>@an.Descripcion</div>
                                     @if (!string.IsNullOrEmpty(an.Observaciones))
                                     {

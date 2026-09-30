@@ -29,7 +29,7 @@
             <div class="login-tarjeta">
                 <h2 class="login-titulo-formulario">Iniciar Sesión</h2>
 
-                <form asp-action="Login" method="post">
+                <form asp-action="Login" method="post" id="formLogin">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
 
                     <div class="login-form-group">
@@ -47,6 +47,11 @@
                             </button>
                         </div>
                         <span asp-validation-for="Contrasena" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="chkRecordarUsuario" />
+                        <label class="form-check-label login-label" for="chkRecordarUsuario">Recordar usuario</label>
                     </div>
 
                     <button type="submit" class="login-boton-submit">
@@ -80,6 +85,41 @@
                 }
             });
         }
+
+        // Recordar usuario: se guarda solo el nombre de usuario (nunca la contraseña) y vence en 1 hora
+        const CLAVE_RECORDAR = 'clinica.recordarUsuario';
+        const DURACION_RECORDAR_MS = 60 * 60 * 1000;
+        const formLogin = document.getElementById('formLogin');
+        const txtUsuario = document.getElementById('NombreUsuario');
+        const chkRecordar = document.getElementById('chkRecordarUsuario');
+
+        try {
+            const guardado = JSON.parse(localStorage.getItem(CLAVE_RECORDAR) || 'null');
+            if (guardado && guardado.vence > Date.now()) {
+                if (!txtUsuario.value) txtUsuario.value = guardado.usuario;
+                chkRecordar.checked = true;
+                if (txtUsuario.value) txtContrasena.focus();
+            } else if (guardado) {
+                localStorage.removeItem(CLAVE_RECORDAR);
+            }
+        } catch (e) {
+            // Sin acceso a localStorage (p. ej. navegación privada): el login funciona igual
+        }
+
+        formLogin.addEventListener('submit', function () {
+            try {
+                if (chkRecordar.checked && txtUsuario.value.trim()) {
+                    localStorage.setItem(CLAVE_RECORDAR, JSON.stringify({
+                        usuario: txtUsuario.value.trim(),
+                        vence: Date.now() + DURACION_RECORDAR_MS
+                    }));
+                } else {
+                    localStorage.removeItem(CLAVE_RECORDAR);
+                }
+            } catch (e) {
+                // Sin acceso a localStorage: se ignora
+            }
+        });
     </script>
 </body>
 </html>

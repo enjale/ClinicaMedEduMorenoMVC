@@ -7,13 +7,9 @@
 }
 
 <!-- Encabezado -->
-<div class="d-flex justify-content-between align-items-start mb-3">
-    <div>
-        <h4 style="font-weight:700; color:#2F3E34; margin-bottom:0.15rem;">Crear Nuevo Expediente</h4>
-        <a asp-action="Index" style="color:#6B7280; font-size:0.9rem; text-decoration:none;">
-            ← Volver al listado
-        </a>
-    </div>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 style="font-weight:700; color:#2F3E34; margin:0;">Crear Nuevo Expediente</h4>
+    <a asp-action="Index" class="btn btn-sm btn-outline-secondary">← Volver</a>
 </div>
 
 <hr style="margin: 0 0 1.5rem 0;" />
@@ -52,7 +48,7 @@
             </div>
 
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label asp-for="Sexo" class="form-label fw-semibold">Sexo *</label>
                 <select asp-for="Sexo" class="form-select">
                     <option value="">-- Seleccione --</option>
@@ -62,12 +58,17 @@
                 <span asp-validation-for="Sexo" class="text-danger small"></span>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label asp-for="FechaNac" class="form-label fw-semibold">Fecha de Nacimiento *</label>
                 <input asp-for="FechaNac" type="date" class="form-control" id="fechaNac"
                        max="@DateTime.Today.ToString("yyyy-MM-dd")" />
                 <span asp-validation-for="FechaNac" class="text-danger small"></span>
-                <small id="edadCalc" class="fw-semibold text-muted"></small>
+            </div>
+
+            <!-- Edad: se calcula automáticamente a partir de la fecha de nacimiento -->
+            <div class="col-md-2">
+                <label for="edadCalc" class="form-label fw-semibold">Edad</label>
+                <input id="edadCalc" class="form-control bg-light" readonly tabindex="-1" placeholder="—" />
             </div>
 
             <!-- DUI: solo visible para mayores de 18 -->
@@ -241,19 +242,21 @@
         const edadCalc    = document.getElementById('edadCalc');
 
         function calcularEdad(fechaNac) {
+            // Se lee la fecha como local (yyyy-mm-dd) para no perder un día por la zona horaria
+            const [anio, mes, dia] = fechaNac.split('-').map(Number);
             const hoy = new Date();
-            const nac = new Date(fechaNac);
-            let edad = hoy.getFullYear() - nac.getFullYear();
-            const m = hoy.getMonth() - nac.getMonth();
-            if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) edad--;
+            let edad = hoy.getFullYear() - anio;
+            const m = (hoy.getMonth() + 1) - mes;
+            if (m < 0 || (m === 0 && hoy.getDate() < dia)) edad--;
             return edad;
         }
 
         function actualizarUI() {
-            if (!inputFecha.value) { edadCalc.textContent = ''; return; }
+            if (!inputFecha.value) { edadCalc.value = ''; return; }
 
             const edad = calcularEdad(inputFecha.value);
-            edadCalc.textContent = `Edad calculada: ${edad} años`;
+            if (isNaN(edad) || edad < 0) { edadCalc.value = ''; return; }
+            edadCalc.value = `${edad} ${edad === 1 ? 'año' : 'años'}`;
 
             if (edad < 18) {
                 campoDUI.style.display = 'none';
@@ -269,6 +272,7 @@
             }
         }
 
+        inputFecha.addEventListener('input', actualizarUI);
         inputFecha.addEventListener('change', actualizarUI);
         if (inputFecha.value) actualizarUI();
 

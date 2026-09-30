@@ -165,8 +165,8 @@
                 <table class="table align-middle mb-0">
                     <thead>
                         <tr>
-                            <th style="width: 12%;">Código</th>
-                            <th style="width: 11%;">Fecha</th>
+                            <th style="width: 1%;" class="text-nowrap">Código</th>
+                            <th style="width: 1%;" class="text-nowrap">Fecha</th>
                             <th style="width: 20%;">Motivo</th>
                             <th style="width: 22%;">Diagnóstico</th>
                             <th style="width: 22%;">Medicamentos</th>
@@ -181,7 +181,7 @@
                             {
                                 <tr class="@(h.ConsultaId == Model.ConsultaOrigenId ? "table-active" : "")">
                                     <td><span class="badge-codigo">@h.Codigo</span></td>
-                                    <td>@h.Fecha.ToString("dd/MM/yyyy")</td>
+                                    <td class="text-nowrap">@h.Fecha.ToString("dd/MM/yyyy")</td>
                                     <td>@h.Motivo</td>
                                     <td class="small">@(h.Diagnosticos.Any() ? string.Join(", ", h.Diagnosticos) : "—")</td>
                                     <td class="small">@(h.Medicamentos.Any() ? string.Join(", ", h.Medicamentos) : "—")</td>

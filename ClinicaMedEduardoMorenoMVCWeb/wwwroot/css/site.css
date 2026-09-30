@@ -576,6 +576,8 @@ a:hover {
     padding: 0.35rem 0.65rem;
     border-radius: 4px;
     border: 1px solid var(--color-borde);
+    display: inline-block;
+    white-space: nowrap; /* El código nunca se parte en dos líneas */
 }
 
 /* ==========================================================================

@@ -128,13 +128,13 @@
                                     <a asp-action="Details" asp-route-id="@item.ConsultaId" class="btn btn-sm btn-outline-secondary me-1">Ver</a>
                                     @if (item.Estado == "atendida")
                                     {
-                                        <button type="button" class="btn btn-sm btn-outline-secondary" title="Imprimir (Próximamente)" disabled>
+                                        <a asp-action="Imprimir" asp-route-id="@item.ConsultaId" target="_blank" class="btn btn-sm btn-outline-secondary" title="Imprimir receta">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
                                                 <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1" />
                                                 <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1" />
                                             </svg>
                                             <span class="visually-hidden">Imprimir</span>
-                                        </button>
+                                        </a>
                                     }
                                 }
                                 else
@@ -143,13 +143,13 @@
                                     @if (item.Estado == "atendida")
                                     {
                                         <a asp-action="Details" asp-route-id="@item.ConsultaId" class="btn btn-sm btn-outline-primary me-1">Editar</a>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary me-1" title="Imprimir (Próximamente)" disabled>
+                                        <a asp-action="Imprimir" asp-route-id="@item.ConsultaId" target="_blank" class="btn btn-sm btn-outline-secondary me-1" title="Imprimir receta">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
                                                 <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1" />
                                                 <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1" />
                                             </svg>
                                             <span class="visually-hidden">Imprimir</span>
-                                        </button>
+                                        </a>
                                     }
                                     else
                                     {

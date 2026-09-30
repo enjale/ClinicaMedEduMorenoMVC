@@ -1,8 +1,12 @@
 @model ClinicaMedEduardoMorenoMVCWeb.Models.ViewModels.ConsultaDetalleViewModel
 
 @{
+    // Réplica de la receta médica del prototipo (FrmRecetaImpresion): hoja de 960 x 680 en horizontal
     Layout = null;
     var c = Model.Consulta;
+    var codigoReceta = Model.Receta?.Codigo ?? c.Codigo;
+    var codigoExpediente = string.IsNullOrWhiteSpace(Model.CodigoExpediente) ? "—" : Model.CodigoExpediente;
+    var nombreMedico = string.IsNullOrWhiteSpace(c.Medico) ? "Dr. Eduardo Moreno" : c.Medico;
 }
 
 <!DOCTYPE html>
@@ -10,108 +14,270 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Consulta @c.Codigo - Clínica Médica</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <title>Receta @codigoReceta - Clínica Médica</title>
     <style>
-        body { background: #f3f4f6; }
-        .hoja { max-width: 800px; margin: 2rem auto; background: #fff; padding: 2.5rem; border: 1px solid var(--color-borde); border-radius: 6px; }
-        .hoja-encabezado { border-bottom: 3px solid var(--color-principal); padding-bottom: 1rem; margin-bottom: 1.5rem; }
-        .hoja h6 { color: var(--color-principal-oscuro); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; margin: 1.5rem 0 0.75rem; }
-        .firma { margin-top: 4rem; width: 260px; border-top: 1px solid #333; text-align: center; padding-top: 0.35rem; }
+        :root {
+            --verde-tema: #6B8E7A;
+            --verde-suave: #8CA486;
+            --verde-caja: #E9F0EA;
+            --borde-caja: #CEDED1;
+            --texto-oscuro: #2B382F;
+            --texto-secundario: #46554B;
+            --separador: #D7E4DA;
+            --subrayado: #A0B2A2;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+            color: var(--texto-oscuro);
+            background: #EBF0EC;
+        }
+
+        /* ===== Barra superior de la vista previa ===== */
+        .barra {
+            height: 60px;
+            background: #E7ECE8;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px 0 20px;
+        }
+
+        .barra-titulo { font-size: 14pt; font-weight: 700; color: var(--texto-oscuro); }
+        .barra-botones { display: flex; gap: 12px; }
+
+        .boton {
+            height: 38px;
+            padding: 0 18px;
+            border-radius: 4px;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .boton-imprimir { background: var(--verde-tema); color: #fff; border: none; min-width: 150px; }
+        .boton-imprimir:hover { background: #5B7A68; }
+        .boton-cerrar { background: #fff; color: var(--texto-oscuro); border: 1px solid #C9D3CB; min-width: 95px; }
+
+        .contenedor { padding: 20px 30px; display: flex; justify-content: center; }
+
+        /* ===== Hoja de la receta ===== */
+        .hoja {
+            position: relative;
+            width: 960px;
+            min-height: 680px;
+            background: #fff;
+            padding: 302px 25px 20px;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .hoja::before {
+            content: "";
+            position: absolute;
+            inset: 4px;
+            border: 2.5px solid var(--verde-suave);
+            border-radius: 14px;
+            pointer-events: none;
+        }
+
+        .abs { position: absolute; white-space: nowrap; }
+
+        .linea-decorativa { position: absolute; left: 35px; width: 560px; border-top: 2.5px solid var(--verde-suave); }
+
+        .titulo {
+            position: absolute;
+            left: 35px; top: 76px; width: 560px; height: 78px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 34pt; font-weight: 700; color: var(--verde-tema);
+        }
+
+        .caja-medico {
+            position: absolute;
+            left: 635px; top: 25px; width: 290px; height: 185px;
+            background: var(--verde-caja);
+            border: 1.2px solid var(--borde-caja);
+            border-radius: 10px;
+        }
+
+        .icono { position: absolute; transform: translate(-50%, -50%); fill: var(--verde-tema); }
+
+        .etiqueta { font-size: 10pt; font-weight: 700; }
+
+        .pildora {
+            position: absolute;
+            height: 26px;
+            border: 1.5px solid var(--verde-suave);
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10pt; font-weight: 700;
+        }
+
+        .paciente {
+            position: absolute;
+            left: 25px; top: 258px; width: 910px; height: 34px;
+            border: 1.5px solid var(--verde-suave);
+            border-radius: 6px;
+        }
+
+        /* ===== Tabla de medicamentos ===== */
+        .tabla {
+            position: relative;
+            min-height: 285px;
+            border: 1.5px solid var(--verde-suave);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .tabla::after {
+            /* Línea divisoria vertical entre columnas */
+            content: "";
+            position: absolute;
+            left: 445px; top: 32px; bottom: 0;
+            border-left: 1.5px solid var(--verde-suave);
+        }
+
+        .tabla-encabezado {
+            display: grid;
+            grid-template-columns: 445px 1fr;
+            height: 32px;
+            background: var(--verde-suave);
+            color: #fff;
+            font-size: 10.5pt;
+            font-weight: 700;
+        }
+
+        .tabla-encabezado div { display: flex; align-items: center; justify-content: center; }
+        .tabla-encabezado div + div { border-left: 1px solid #fff; }
+
+        .tabla-cuerpo { padding-top: 10px; }
+
+        .fila {
+            position: relative;
+            display: grid;
+            grid-template-columns: 445px 1fr;
+            min-height: 46px;
+            padding-bottom: 6px;
+        }
+
+        .fila::after {
+            content: "";
+            position: absolute;
+            left: 10px; right: 10px; bottom: 6px;
+            border-top: 1px solid var(--separador);
+        }
+
+        .fila > div { padding: 0 15px; }
+        .med-nombre { font-size: 9.5pt; font-weight: 700; }
+        .med-cantidad { font-size: 8.5pt; font-style: italic; color: var(--texto-secundario); }
+        .med-prescripcion { font-size: 9pt; }
+
+        /* ===== Pie: fecha y firma ===== */
+        .pie { position: relative; height: 60px; margin-top: 18px; }
 
         @@media print {
+            @@page { size: letter landscape; margin: 0.5in; }
             body { background: #fff; }
-            .no-imprimir { display: none !important; }
-            .hoja { margin: 0; border: none; padding: 0; max-width: none; }
+            .barra { display: none; }
+            .contenedor { padding: 0; }
         }
     </style>
 </head>
 <body>
-    <div class="no-imprimir text-center mt-3">
-        <button type="button" class="btn btn-primary" onclick="window.print()">Imprimir</button>
-        <button type="button" class="btn btn-outline-secondary" onclick="window.close()">Cerrar</button>
+    <div class="barra">
+        <div class="barra-titulo">Vista Previa de Receta Médica</div>
+        <div class="barra-botones">
+            <button type="button" class="boton boton-imprimir" onclick="window.print()">🖨 Imprimir Receta</button>
+            <button type="button" class="boton boton-cerrar" onclick="window.close()">Cerrar</button>
+        </div>
     </div>
 
-    <div class="hoja">
-        <div class="hoja-encabezado d-flex justify-content-between align-items-end">
-            <div>
-                <small class="text-muted text-uppercase">Clínica Médica</small>
-                <h3 class="mb-0 fw-bold">Eduardo Moreno</h3>
-            </div>
-            <div class="text-end">
-                <div class="fw-bold">Consulta @c.Codigo</div>
-                <div class="text-muted small">Fecha: @c.Fecha.ToString("dd/MM/yyyy")</div>
-            </div>
-        </div>
+    <div class="contenedor">
+        <div class="hoja">
 
-        <h6>Datos del paciente</h6>
-        <table class="table table-sm table-borderless mb-0">
-            <tr>
-                <td class="text-muted" style="width: 20%;">Paciente:</td>
-                <td class="fw-semibold" style="width: 40%;">@Model.NombrePaciente</td>
-                <td class="text-muted" style="width: 15%;">Expediente:</td>
-                <td>@Model.CodigoExpediente</td>
-            </tr>
-            <tr>
-                <td class="text-muted">Edad:</td>
-                <td>@(Model.EdadPaciente.HasValue ? $"{Model.EdadPaciente} años" : "—")</td>
-                <td class="text-muted">Sexo:</td>
-                <td>@(string.IsNullOrEmpty(Model.SexoPaciente) ? "—" : Model.SexoPaciente)</td>
-            </tr>
-        </table>
+            <!-- Encabezado: título "RECETA MÉDICA" -->
+            <div class="linea-decorativa" style="top: 67px;"></div>
+            <div class="titulo">RECETA MÉDICA</div>
+            <div class="linea-decorativa" style="top: 161px;"></div>
 
-        <h6>Motivo de consulta</h6>
-        <p style="white-space: pre-line;">@c.Motivo</p>
+            <!-- Caja de información del médico / clínica -->
+            <div class="caja-medico"></div>
+            <svg class="icono" style="left: 655px; top: 48px;" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M8 0a5.5 5.5 0 0 0-5.5 5.5C2.5 9.6 8 16 8 16s5.5-6.4 5.5-10.5A5.5 5.5 0 0 0 8 0zm0 7.8a2.3 2.3 0 1 1 0-4.6 2.3 2.3 0 0 1 0 4.6z" />
+            </svg>
+            <div class="abs" style="left: 672px; top: 36px; font-size: 11.5pt;">Clínica Médica</div>
+            <div class="abs" style="left: 672px; top: 54px; font-size: 12.5pt; font-weight: 700;">Dr. Eduardo Moreno</div>
+            <div class="abs" style="left: 648px; top: 82px; width: 264px; border-top: 1px solid var(--separador);"></div>
 
-        <h6>Signos vitales</h6>
-        <table class="table table-sm table-bordered text-center mb-0">
-            <thead>
-                <tr>
-                    <th>@Html.DisplayNameFor(m => m.Consulta.VitalPeso)</th>
-                    <th>@Html.DisplayNameFor(m => m.Consulta.VitalTemperatura)</th>
-                    <th>@Html.DisplayNameFor(m => m.Consulta.VitalPresion)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>@(c.VitalPeso?.ToString("0.##") ?? "—")</td>
-                    <td>@(c.VitalTemperatura?.ToString("0.0") ?? "—")</td>
-                    <td>@(string.IsNullOrEmpty(c.VitalPresion) ? "—" : c.VitalPresion)</td>
-                </tr>
-            </tbody>
-        </table>
+            <svg class="icono" style="left: 655px; top: 99px;" width="15" height="15" viewBox="0 0 16 16" aria-hidden="true">
+                <circle cx="8" cy="4" r="3.6" />
+                <path d="M1 16c0-4.2 3.1-7.4 7-7.4s7 3.2 7 7.4z" />
+                <rect x="6.3" y="11.3" width="3.4" height="1.2" fill="#fff" />
+                <rect x="7.4" y="10.2" width="1.2" height="3.4" fill="#fff" />
+            </svg>
+            <div class="abs" style="left: 672px; top: 90px; font-size: 9.5pt; font-weight: 700;">@nombreMedico</div>
+            <div class="abs" style="left: 672px; top: 108px; font-size: 9pt; color: var(--texto-secundario);">Médico General</div>
+            <div class="abs" style="left: 672px; top: 124px; font-size: 9pt; color: var(--texto-secundario);">J.V.P.M. No. 12345</div>
 
-        <h6>Diagnóstico</h6>
-        @if (Model.Enfermedades.Any())
-        {
-            @foreach (var item in Model.Enfermedades)
-            {
-                <div class="mb-3">
-                    <div class="fw-semibold">@item.NombreEnfermedad <span class="text-muted small">(@item.TipoEnfermedad)</span></div>
-                    @if (!string.IsNullOrEmpty(item.Observaciones))
+            <svg class="icono" style="left: 655px; top: 149px;" width="13" height="13" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M3.6 1.1a1.4 1.4 0 0 1 2.1.1l1.6 2.1c.4.5.4 1.2 0 1.7l-.9 1.1a9.7 9.7 0 0 0 3.5 3.5l1.1-.9c.5-.4 1.2-.4 1.7 0l2.1 1.6c.6.5.7 1.4.1 2.1l-.9.9c-.8.8-2 1.1-3.1.7A16 16 0 0 1 1.9 5.9c-.4-1.1-.1-2.3.7-3.1z" />
+            </svg>
+            <div class="abs" style="left: 672px; top: 142px; font-size: 9pt;">(503) 2455-0000</div>
+
+            <svg class="icono" style="left: 655px; top: 168px;" width="13" height="13" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M8 0a5.5 5.5 0 0 0-5.5 5.5C2.5 9.6 8 16 8 16s5.5-6.4 5.5-10.5A5.5 5.5 0 0 0 8 0zm0 7.8a2.3 2.3 0 1 1 0-4.6 2.3 2.3 0 0 1 0 4.6z" />
+            </svg>
+            <div class="abs" style="left: 672px; top: 161px; font-size: 9pt; color: var(--texto-secundario);">El Sauce, Sonzacate</div>
+            <div class="abs" style="left: 672px; top: 176px; font-size: 9pt; color: var(--texto-secundario);">Sonsonate, El Salvador</div>
+
+            <!-- Identificadores: No. Receta y No. Expediente -->
+            <div class="abs etiqueta" style="left: 35px; top: 225px;">No. Receta:</div>
+            <div class="pildora" style="left: 138px; top: 222px; width: 120px;">@codigoReceta</div>
+            <div class="abs etiqueta" style="left: 415px; top: 225px;">No. Expediente:</div>
+            <div class="pildora" style="left: 560px; top: 222px; width: 150px;">@codigoExpediente</div>
+
+            <!-- Nombre del paciente -->
+            <div class="paciente"></div>
+            <div class="abs etiqueta" style="left: 40px; top: 266px;">Nombre del paciente:</div>
+            <div class="abs" style="left: 232px; top: 266px; font-size: 10pt;">@Model.NombrePaciente.ToUpper()</div>
+            <div class="abs" style="left: 230px; top: 284px; width: 690px; border-top: 1.2px solid var(--subrayado);"></div>
+
+            <!-- Tabla de medicamentos y especificaciones -->
+            <div class="tabla">
+                <div class="tabla-encabezado">
+                    <div>MEDICAMENTO</div>
+                    <div>ESPECIFICACIONES</div>
+                </div>
+                <div class="tabla-cuerpo">
+                    @foreach (var med in Model.Medicamentos)
                     {
-                        <div style="white-space: pre-line;">@item.Observaciones</div>
+                        <div class="fila">
+                            <div>
+                                <div class="med-nombre">@med.NombreMedicamento</div>
+                                @if (!string.IsNullOrWhiteSpace(med.Cantidad))
+                                {
+                                    <div class="med-cantidad">Cantidad: @med.Cantidad</div>
+                                }
+                            </div>
+                            <div class="med-prescripcion">@med.Prescripcion</div>
+                        </div>
                     }
                 </div>
-            }
-        }
-        else
-        {
-            <p class="text-muted">Sin diagnósticos registrados.</p>
-        }
+            </div>
 
+            <!-- Pie: fecha y firma y sello del médico -->
+            <div class="pie">
+                <div class="abs etiqueta" style="left: 10px; top: 8px; font-size: 9.5pt;">Fecha:</div>
+                <div class="abs" style="left: 73px; top: 8px; font-size: 9.5pt;">@c.Fecha.ToString("dd/MM/yyyy")</div>
+                <div class="abs" style="left: 65px; top: 26px; width: 135px; border-top: 1.5px solid var(--verde-suave);"></div>
 
-        <div class="d-flex justify-content-end">
-            <div class="firma">
-                <div class="fw-semibold">@(string.IsNullOrEmpty(c.Medico) ? "Médico tratante" : c.Medico)</div>
-                <div class="text-muted small">Firma y sello</div>
+                <div class="abs" style="left: 565px; top: 12px; width: 320px; border-top: 1.5px solid var(--texto-oscuro);"></div>
+                <div class="abs" style="left: 565px; top: 18px; width: 320px; text-align: center; font-size: 9.5pt;">Firma y sello del médico</div>
             </div>
         </div>
     </div>
-
-    <script>
-        window.addEventListener('load', function () { window.print(); });
-    </script>
 </body>
 </html>

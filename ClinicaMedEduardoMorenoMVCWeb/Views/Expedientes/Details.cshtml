@@ -56,9 +56,17 @@
 <!-- ───── TAB: DATOS DEL PACIENTE ───── -->
 @if (tab == "datos")
 {
+	// Edad calculada a la fecha actual a partir de la fecha de nacimiento
+	int? edad = null;
+	if (Model.Paciente?.FechaNac is DateTime fechaNac)
+	{
+		edad = DateTime.Today.Year - fechaNac.Year;
+		if (fechaNac.Date > DateTime.Today.AddYears(-edad.Value)) edad--;
+	}
+
 	<div class="row g-4">
 		<div class="col-md-6">
-			<div class="seccion-card">
+			<div class="seccion-card h-100">
 				<h5 class="seccion-titulo">Información Personal</h5>
 				<dl class="row mb-0">
 					<dt class="col-sm-5 campo-label">Nombre completo</dt>
@@ -83,6 +91,9 @@
 					<dt class="col-sm-5 campo-label">Fecha de nacimiento</dt>
 					<dd class="col-sm-7">@(Model.Paciente?.FechaNac?.ToString("dd/MM/yyyy") ?? "—")</dd>
 
+					<dt class="col-sm-5 campo-label">Edad</dt>
+					<dd class="col-sm-7">@(edad.HasValue ? $"{edad} años" : "—")</dd>
+
 					<dt class="col-sm-5 campo-label">DUI</dt>
 					<dd class="col-sm-7">@(string.IsNullOrEmpty(Model.Paciente?.DUI) ? "—" : Model.Paciente.DUI)</dd>
 
@@ -95,7 +106,7 @@
 			</div>
 		</div>
 		<div class="col-md-6">
-			<div class="seccion-card">
+			<div class="seccion-card h-100">
 				<h5 class="seccion-titulo">Medidas y Expediente</h5>
 				<dl class="row mb-0">
 					<dt class="col-sm-5 campo-label">Altura</dt>

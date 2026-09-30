@@ -8,6 +8,13 @@
                         ?? User.Identity?.Name
                         ?? (esEnfermera ? "Enfermera" : "Dr. Eduardo Moreno");
     var rolTexto = esEnfermera ? "Enfermera" : "Doctor";
+
+    // Iniciales para el avatar del menú de usuario (sin prefijos como "Dr." o "Enf.")
+    var iniciales = string.Concat(nombreUsuario
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Where(p => !p.EndsWith("."))
+        .Take(2)
+        .Select(p => char.ToUpper(p[0])));
 }
 <!DOCTYPE html>
 <html lang="es">
@@ -45,20 +52,41 @@
                 <a asp-controller="Enfermedades" asp-action="Index">Enfermedades</a>
             }
         </nav>
-
-        <!--Cierre De Sesion-->
-        <div class="sidebar-footer">
-            <a asp-controller="Account" asp-action="Logout">Cerrar Sesion</a>
-        </div>
     </aside>
 
     <!--Contenido de derecha-->
     <main class="contenido-principal flex-grow-1">
 
         <!--Barra Superior Verde con Datos Del Usuario Activo-->
-        <header class="header-doctor text-end">
-            <span class="fw-bold d-block">@(ViewData["Seccion"] ?? ViewData["Title"] ?? "Panel Principal")</span>
-            <span class="d-block small">@nombreUsuario · @rolTexto</span>
+        <header class="header-doctor d-flex justify-content-between align-items-center">
+            <span class="fw-bold">@(ViewData["Seccion"] ?? ViewData["Title"] ?? "Panel Principal")</span>
+
+            <!-- Menú de usuario con la opción de cerrar sesión -->
+            <div class="dropdown">
+                <button type="button" class="usuario-menu-boton dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="usuario-avatar">@iniciales</span>
+                    <span class="text-start lh-sm">
+                        <span class="d-block usuario-nombre">@nombreUsuario</span>
+                        <span class="d-block usuario-rol">@rolTexto</span>
+                    </span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm usuario-menu">
+                    <li class="px-3 py-2">
+                        <div class="fw-semibold">@nombreUsuario</div>
+                        <div class="small text-muted">@rolTexto</div>
+                    </li>
+                    <li><hr class="dropdown-divider" /></li>
+                    <li>
+                        <a class="dropdown-item usuario-menu-salir" asp-controller="Account" asp-action="Logout">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-2" viewBox="0 0 16 16" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z" />
+                                <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z" />
+                            </svg>
+                            Cerrar sesión
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </header>
 
         <!-- Contenido de la vista -->

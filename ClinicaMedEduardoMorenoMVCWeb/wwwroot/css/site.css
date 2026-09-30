@@ -466,6 +466,67 @@ a:hover {
     font-size: 0.8rem;
 }
 
+/* Menú de usuario (encabezado): avatar, nombre, rol y opción de cerrar sesión */
+.usuario-menu-boton {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: #ffffff;
+    padding: 0.3rem 0.6rem;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.usuario-menu-boton:hover,
+.usuario-menu-boton[aria-expanded="true"] {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.usuario-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: var(--color-secundario);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.usuario-nombre {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.usuario-rol {
+    color: var(--color-acento);
+    font-size: 0.75rem;
+}
+
+.usuario-menu {
+    min-width: 220px;
+    border-color: var(--color-borde);
+}
+
+.usuario-menu-salir {
+    display: flex;
+    align-items: center;
+    color: #b54834;
+    font-weight: 600;
+}
+
+.usuario-menu-salir:hover,
+.usuario-menu-salir:focus {
+    background-color: #fbeeea;
+    color: #9c3a28;
+}
+
 .contenido-principal {
     background-color: var(--color-fondo-general);
     display: flex;

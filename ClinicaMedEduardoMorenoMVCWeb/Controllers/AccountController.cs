@@ -80,13 +80,8 @@ namespace ClinicaMedEduardoMorenoMVCWeb.Controllers
             var claimsIdentity = new System.Security.Claims.ClaimsIdentity(claims, Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme, new System.Security.Claims.ClaimsPrincipal(claimsIdentity));
 
-            // Redirección según rol: si es Enfermera a su panel, si es Doctor/otro a DoctorDashboard
-            if (usuario.Rol != null && usuario.Rol.Equals("Enfermera", StringComparison.OrdinalIgnoreCase))
-            {
-                return RedirectToAction("EnfermeraDashboard", "Home", new { enfermera = usuario.Nombre });
-            }
-
-            return RedirectToAction("DoctorDashboard", "Home", new { doctorNombre = usuario.Nombre });
+            // Después de iniciar sesión, todos los usuarios entran a Consultas Médicas
+            return RedirectToAction("Index", "Consultas");
         }
 
         [HttpGet]
